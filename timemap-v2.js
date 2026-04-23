@@ -29,16 +29,312 @@ const ui = {
   searchInput: document.getElementById("searchInput"),
   searchStatus: document.getElementById("searchStatus"),
   searchResults: document.getElementById("searchResults"),
+  timelineMenuButton: document.getElementById("timelineMenuButton"),
+  timelineMenuOverlay: document.getElementById("timelineMenuOverlay"),
+  timelineSideMenu: document.getElementById("timelineSideMenu"),
+  timelineMenuCloseButton: document.getElementById("timelineMenuCloseButton"),
+  timelineMenuLabel: document.getElementById("timelineMenuLabel"),
+  timelineMenuTitle: document.getElementById("timelineMenuTitle"),
+  languageSelect: document.getElementById("languageSelect"),
+  menuLanguageTitle: document.getElementById("menuLanguageTitle"),
+  menuLanguageLabel: document.getElementById("menuLanguageLabel"),
+  menuLanguageDescription: document.getElementById("menuLanguageDescription"),
+  menuHelpTitle: document.getElementById("menuHelpTitle"),
+  menuHelpDescription: document.getElementById("menuHelpDescription"),
+  menuAppsTitle: document.getElementById("menuAppsTitle"),
+  menuAppsDescription: document.getElementById("menuAppsDescription"),
+  menuVisualToolsTitle: document.getElementById("menuVisualToolsTitle"),
+  menuVisualToolsDescription: document.getElementById("menuVisualToolsDescription"),
+  workspaceStripLabel: document.getElementById("workspaceStripLabel"),
+  editorPanelLabel: document.getElementById("editorPanelLabel"),
+  editorPanelTitle: document.getElementById("editorPanelTitle"),
+  eventLibraryLabel: document.getElementById("eventLibraryLabel"),
+  searchPanelLabel: document.getElementById("searchPanelLabel"),
+  searchPanelTitle: document.getElementById("searchPanelTitle"),
+  searchSubmitButton: document.getElementById("searchSubmitButton"),
 };
 
 const timelineEvents = [];
 const eventGroups = [];
 const DAYS_PER_YEAR = 365.2425;
 const SAFE_DATE_YEAR_LIMIT = 275000;
-const MONTH_LABELS = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+const MONTH_LABELS = {
+  de: ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+};
 const BAR_DEFAULT_COLOR = "#6f8f52";
 const TIMELINE_PADDING_X = 80;
 const TIMEMAP_FOLDER_EXPORT_VERSION = 1;
+const POSITIVE_LANES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+const NEGATIVE_LANES = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12];
+const LANGUAGE_STORAGE_KEY = "timemap-language";
+const LANGUAGE_OPTIONS = [
+  { code: "de", label: "Deutsch", supported: true },
+  { code: "en", label: "English", supported: true },
+  { code: "bg", label: "Bulgarian", supported: false },
+  { code: "cs", label: "Czech", supported: false },
+  { code: "da", label: "Danish", supported: false },
+  { code: "el", label: "Greek", supported: false },
+  { code: "es", label: "Spanish", supported: false },
+  { code: "et", label: "Estonian", supported: false },
+  { code: "fi", label: "Finnish", supported: false },
+  { code: "fr", label: "French", supported: false },
+  { code: "ga", label: "Irish", supported: false },
+  { code: "hr", label: "Croatian", supported: false },
+  { code: "hu", label: "Hungarian", supported: false },
+  { code: "it", label: "Italian", supported: false },
+  { code: "lt", label: "Lithuanian", supported: false },
+  { code: "lv", label: "Latvian", supported: false },
+  { code: "mt", label: "Maltese", supported: false },
+  { code: "nl", label: "Dutch", supported: false },
+  { code: "pl", label: "Polish", supported: false },
+  { code: "pt", label: "Portuguese", supported: false },
+  { code: "ro", label: "Romanian", supported: false },
+  { code: "sk", label: "Slovak", supported: false },
+  { code: "sl", label: "Slovenian", supported: false },
+  { code: "sv", label: "Swedish", supported: false },
+  { code: "uk", label: "Ukrainian", supported: false },
+];
+const I18N = {
+  de: {
+    timeline_menu_open: "Menue oeffnen",
+    timeline_menu_close: "Menue schliessen",
+    timeline_menu: "Menue",
+    timeline_menu_title: "Zeitstrahl-Menue",
+    menu_language_title: "1. Sprachauswahl",
+    menu_language_label: "Sprache",
+    menu_language_description: "Deutsch und Englisch sind bereits funktional. Weitere EU-Sprachen plus Ukrainisch sind vorbereitet.",
+    menu_help_title: "2. Hilfe zur Funktionsweise der App",
+    menu_help_description: "Platz fuer eine kurze Einfuehrung, Bedienhinweise und erklaerende Beispiele.",
+    menu_apps_title: "3. Wechsel zu anderen Applikationen",
+    menu_apps_description: "Vorbereitung fuer weitere Werkzeuge wie GenMap zur Anzeige genealogischer GEDCOM-Dateien.",
+    menu_visual_tools_title: "4. Weitere Data-Visualisation Tools",
+    menu_visual_tools_description: "Bereich fuer kuenftige Module und alternative Visualisierungsansichten.",
+    reset_view: "Startansicht",
+    zoom_in: "Zoomen +",
+    zoom_out: "Zoomen -",
+    today: "Heute",
+    timeline_aria: "Interaktiver historischer Zahlenstrahl",
+    workspace_strip: "Ereignisbibliothek",
+    fullscreen_toggle: "Vollbild umschalten",
+    editor_panel_label: "Bearbeitung",
+    editor_panel_title: "Ereignisbibliothek",
+    editor_empty: "Fuege ueber die Suche rechts ein Wikidata-Ereignis hinzu oder waehle einen vorhandenen Eintrag aus dem Zeitstrahl.",
+    event_library_label: "Ereignisbrowser",
+    add_event: "Ereignis",
+    add_folder: "Ordner",
+    add_more: "Hinzufuegen",
+    import: "Importieren",
+    search_panel_label: "Wikidata-Suche",
+    search_panel_title: "Eintraege finden und hinzufuegen",
+    search_placeholder: "Wikidata durchsuchen",
+    search_button: "Suchen",
+    search_default: "Suche nach historischen Ereignissen, Personen, Epochen oder Bauwerken.",
+    no_description: "Keine Beschreibung vorhanden.",
+    no_event_selected: "Kein Ereignis ausgewaehlt",
+    click_marker_hint: "Klicke auf einen Marker auf dem Zeitstrahl oder fuege rechts ein Wikidata-Element hinzu.",
+    no_folder_assigned: "keinem Ordner zugeordnet",
+    from: "Von",
+    year: "Jahr",
+    until: "Bis",
+    range_instead_of_point: "Zeitraum statt Punkt",
+    visible_from: "Sichtbar von",
+    relation_none: "keine Zuordnung",
+    line_none: "keine",
+    line_solid: "durchgezogen",
+    line_dotted: "gepunktet",
+    arrow_down_right: "Pfeil nach unten / rechts",
+    arrow_up_left: "Pfeil nach oben / links",
+    arrow_both: "beidseitig",
+    arrow_none: "ohne Pfeil",
+    line: "Linie",
+    arrows: "Pfeile",
+    relation: "Zuordnung",
+    display_line: "Strecke",
+    display_bar: "Balken",
+    display: "Darstellung",
+    title: "Titel",
+    category: "Kategorie",
+    folder_or_epoch: "Ordner / Epoche",
+    description: "Beschreibung",
+    folder_name: "Ordnername",
+    standard_visible_from: "Standard sichtbar von",
+    inherit_folder: "vom Ordner erben",
+    example_start: "z. B. 1789 oder -66 Ma",
+    example_end: "z. B. 1799, -65 Ma oder heute",
+    example_color: "vom Ordner erben oder z. B. #6f8f52",
+    example_group_color: "z. B. #6f8f52",
+    soon_suffix: "bald",
+    no_year_data: "Jahresdaten fehlen",
+    axis_point: "Achsenpunkt",
+    color_pick_aria: "auswaehlen",
+    no_limit: "keine Einschraenkung",
+    automatic: "Automatisch",
+    bar_upper_zero: "+0 fuer Balken",
+    bar_lower_zero: "-0 unterhalb",
+    above_suffix: "oberhalb",
+    below_suffix: "unterhalb",
+    uncategorized: "Unkategorisiert",
+    no_default: "keine Vorgabe",
+    color_value: "Farbwert",
+    folder_color_value: "Standard-Farbwert",
+    display_height: "Darstellungshoehe",
+    folder_display_height: "Standard-Darstellungshoehe",
+    contains_earth_history: "enthaelt Aeon, Aera, Periode und Epoche aus der lokalen Referenz",
+    already_created: "bereits angelegt",
+    loading_ranges_for: "Lade Zeitraeume fuer {title} aus Wikidata ...",
+    loading_ranges_failed: "Zeitraeume fuer {title} konnten nicht automatisch geladen werden.",
+    show_child_events: "Untergeordnete Ereignisse anzeigen",
+    warning_missing_year_data: "Warnung: Jahresdaten fehlen",
+    event_count_summary_zero: "Ordner ist leer",
+    event_count_summary: "{events} Ereignisse, {folders} Unterordner",
+    local_group: "lokale Gruppe",
+    add_subfolder: "+ Unterordner",
+    folder_properties: "Ordnereigenschaften",
+    export_label: "Export",
+    no_events_in_epoch: "Noch keine Ereignisse in dieser Epoche.",
+    browser_info: "{events} Ereignisse, {folders} Ordner",
+    browser_empty: "Noch keine Ereignisse oder Epochen vorhanden.",
+    search_add_hint: "Haken setzen zum Hinzufuegen",
+    search_added: "Bereits hinzugefuegt",
+    import_failed: "Import fehlgeschlagen. Bitte eine gueltige TimeMap-JSON waehlen.",
+    search_empty: "Noch keine Treffer. Starte oben eine Suche in Wikidata.",
+    search_enter_query: "Bitte gib zuerst einen Suchbegriff ein.",
+    search_loading: "Suche nach \"{query}\" in Wikidata ...",
+    search_results_found: "{count} Treffer gefunden.",
+    search_no_results: "Keine Treffer gefunden.",
+    search_failed: "Die Wikidata-Suche konnte nicht geladen werden. Bitte spaeter erneut versuchen.",
+    loading_result: "Lade {title} aus Wikidata ...",
+    result_added: "{title} wurde hinzugefuegt und kann jetzt links bearbeitet werden.",
+    result_no_years: "Zu {title} konnten keine brauchbaren Zeitdaten geladen werden.",
+    folder_exported: "Ordner {title} wurde als JSON exportiert.",
+    folder_imported: "Ordner {title} wurde importiert.",
+    folder_imported_generic: "Ordner wurde importiert.",
+    today_keyword: "heute",
+    until_connector: "bis",
+    new_event: "Neues Ereignis",
+    new_folder: "Neuer Ordner",
+  },
+  en: {
+    timeline_menu_open: "Open menu",
+    timeline_menu_close: "Close menu",
+    timeline_menu: "Menu",
+    timeline_menu_title: "Timeline Menu",
+    menu_language_title: "1. Language Selection",
+    menu_language_label: "Language",
+    menu_language_description: "German and English already work. Additional EU languages plus Ukrainian are prepared.",
+    menu_help_title: "2. How the App Works",
+    menu_help_description: "Space for a short introduction, usage notes, and explanatory examples.",
+    menu_apps_title: "3. Switch to Other Applications",
+    menu_apps_description: "Preparation for additional tools such as GenMap for displaying genealogical GEDCOM files.",
+    menu_visual_tools_title: "4. Additional Data Visualization Tools",
+    menu_visual_tools_description: "Area for future modules and alternative visualization views.",
+    reset_view: "Reset View",
+    zoom_in: "Zoom +",
+    zoom_out: "Zoom -",
+    today: "Today",
+    timeline_aria: "Interactive historical timeline",
+    workspace_strip: "Event Library",
+    fullscreen_toggle: "Toggle fullscreen",
+    editor_panel_label: "Editing",
+    editor_panel_title: "Event Library",
+    editor_empty: "Use the search on the right to add a Wikidata event or choose an existing item from the timeline.",
+    event_library_label: "Event Browser",
+    add_event: "Event",
+    add_folder: "Folder",
+    add_more: "Add",
+    import: "Import",
+    search_panel_label: "Wikidata Search",
+    search_panel_title: "Find and add entries",
+    search_placeholder: "Search Wikidata",
+    search_button: "Search",
+    search_default: "Search for historical events, people, epochs, or buildings.",
+    no_description: "No description available.",
+    no_event_selected: "No event selected",
+    click_marker_hint: "Click a marker on the timeline or add a Wikidata item on the right.",
+    no_folder_assigned: "no folder assigned",
+    from: "From",
+    year: "Year",
+    until: "To",
+    range_instead_of_point: "Range instead of point",
+    visible_from: "Visible from",
+    relation_none: "no assignment",
+    line_none: "none",
+    line_solid: "solid",
+    line_dotted: "dotted",
+    arrow_down_right: "arrow down / right",
+    arrow_up_left: "arrow up / left",
+    arrow_both: "both directions",
+    arrow_none: "no arrow",
+    line: "Line",
+    arrows: "Arrows",
+    relation: "Assignment",
+    display_line: "Line",
+    display_bar: "Bar",
+    display: "Display",
+    title: "Title",
+    category: "Category",
+    folder_or_epoch: "Folder / Epoch",
+    description: "Description",
+    folder_name: "Folder name",
+    standard_visible_from: "Standard visible from",
+    inherit_folder: "inherit from folder",
+    example_start: "e.g. 1789 or -66 Ma",
+    example_end: "e.g. 1799, -65 Ma or today",
+    example_color: "inherit from folder or e.g. #6f8f52",
+    example_group_color: "e.g. #6f8f52",
+    soon_suffix: "soon",
+    no_year_data: "Year data missing",
+    axis_point: "Axis point",
+    color_pick_aria: "pick",
+    no_limit: "no limit",
+    automatic: "Automatic",
+    bar_upper_zero: "+0 for bars",
+    bar_lower_zero: "-0 below",
+    above_suffix: "above",
+    below_suffix: "below",
+    uncategorized: "Uncategorized",
+    no_default: "no default",
+    color_value: "Color",
+    folder_color_value: "Default color",
+    display_height: "Display height",
+    folder_display_height: "Default display height",
+    contains_earth_history: "contains aeon, era, period, and epoch from the local reference",
+    already_created: "already created",
+    loading_ranges_for: "Loading date ranges for {title} from Wikidata ...",
+    loading_ranges_failed: "Date ranges for {title} could not be loaded automatically.",
+    show_child_events: "Show subordinate events",
+    warning_missing_year_data: "Warning: year data missing",
+    event_count_summary_zero: "Folder is empty",
+    event_count_summary: "{events} events, {folders} subfolders",
+    local_group: "local group",
+    add_subfolder: "+ Subfolder",
+    folder_properties: "Folder properties",
+    export_label: "Export",
+    no_events_in_epoch: "No events in this epoch yet.",
+    browser_info: "{events} events, {folders} folders",
+    browser_empty: "No events or epochs yet.",
+    search_add_hint: "Tick to add",
+    search_added: "Already added",
+    import_failed: "Import failed. Please choose a valid TimeMap JSON file.",
+    search_empty: "No results yet. Start a Wikidata search above.",
+    search_enter_query: "Please enter a search term first.",
+    search_loading: "Searching Wikidata for \"{query}\" ...",
+    search_results_found: "{count} results found.",
+    search_no_results: "No results found.",
+    search_failed: "Wikidata search could not be loaded. Please try again later.",
+    loading_result: "Loading {title} from Wikidata ...",
+    result_added: "{title} was added and can now be edited on the left.",
+    result_no_years: "No usable date data could be loaded for {title}.",
+    folder_exported: "Folder {title} was exported as JSON.",
+    folder_imported: "Folder {title} was imported.",
+    folder_imported_generic: "Folder imported.",
+    today_keyword: "today",
+    until_connector: "to",
+    new_event: "New event",
+    new_folder: "New folder",
+  },
+};
 const EARTH_HISTORY_PRESET = {
   id: "earth-history",
   title: "Erdzeitalter",
@@ -206,6 +502,8 @@ const state = {
   dragState: null,
   browserDragEventId: null,
   suppressClickUntil: 0,
+  timelineMenuOpen: false,
+  language: "de",
 };
 
 if (ui.addCustomEventButton) {
@@ -225,6 +523,119 @@ if (ui.addEpochGroupButton) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function t(key) {
+  return I18N[state.language]?.[key] ?? I18N.de[key] ?? key;
+}
+
+function tf(key, replacements = {}) {
+  let text = t(key);
+  Object.entries(replacements).forEach(([name, value]) => {
+    text = text.replaceAll(`{${name}}`, String(value));
+  });
+  return text;
+}
+
+function getMonthLabels() {
+  return MONTH_LABELS[state.language] ?? MONTH_LABELS.de;
+}
+
+function getWikidataLanguageCode() {
+  return state.language === "en" ? "en" : "de";
+}
+
+function getWikidataLanguageFallbacks() {
+  const primary = getWikidataLanguageCode();
+  return primary === "de" ? "de|en" : "en|de";
+}
+
+function getUiSortLocale() {
+  return state.language === "en" ? "en" : "de";
+}
+
+function loadLanguagePreference() {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (saved && I18N[saved]) {
+      state.language = saved;
+    }
+  } catch {
+    state.language = "de";
+  }
+}
+
+function saveLanguagePreference() {
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, state.language);
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
+function populateLanguageSelect() {
+  if (!ui.languageSelect) return;
+  ui.languageSelect.replaceChildren();
+  LANGUAGE_OPTIONS.forEach((language) => {
+    const option = document.createElement("option");
+    option.value = language.code;
+    option.textContent = language.supported ? language.label : `${language.label} (${t("soon_suffix")})`;
+    option.disabled = !language.supported;
+    option.selected = language.code === state.language;
+    ui.languageSelect.appendChild(option);
+  });
+}
+
+function applyStaticTranslations() {
+  document.title = "TimeMap";
+  document.documentElement.lang = state.language;
+  ui.timelineMenuButton?.setAttribute("aria-label", t("timeline_menu_open"));
+  ui.timelineMenuCloseButton?.setAttribute("aria-label", t("timeline_menu_close"));
+  svg?.setAttribute("aria-label", t("timeline_aria"));
+  ui.fullscreenButton?.setAttribute("aria-label", t("fullscreen_toggle"));
+  ui.openWorkspaceStrip?.setAttribute("aria-label", t("workspace_strip"));
+  if (ui.timelineMenuLabel) ui.timelineMenuLabel.textContent = t("timeline_menu");
+  if (ui.timelineMenuTitle) ui.timelineMenuTitle.textContent = t("timeline_menu_title");
+  if (ui.menuLanguageTitle) ui.menuLanguageTitle.textContent = t("menu_language_title");
+  if (ui.menuLanguageLabel) ui.menuLanguageLabel.textContent = t("menu_language_label");
+  if (ui.menuLanguageDescription) ui.menuLanguageDescription.textContent = t("menu_language_description");
+  if (ui.menuHelpTitle) ui.menuHelpTitle.textContent = t("menu_help_title");
+  if (ui.menuHelpDescription) ui.menuHelpDescription.textContent = t("menu_help_description");
+  if (ui.menuAppsTitle) ui.menuAppsTitle.textContent = t("menu_apps_title");
+  if (ui.menuAppsDescription) ui.menuAppsDescription.textContent = t("menu_apps_description");
+  if (ui.menuVisualToolsTitle) ui.menuVisualToolsTitle.textContent = t("menu_visual_tools_title");
+  if (ui.menuVisualToolsDescription) ui.menuVisualToolsDescription.textContent = t("menu_visual_tools_description");
+  if (ui.resetViewButton) ui.resetViewButton.textContent = t("reset_view");
+  if (ui.zoomInButton) ui.zoomInButton.textContent = t("zoom_in");
+  if (ui.zoomOutButton) ui.zoomOutButton.textContent = t("zoom_out");
+  if (ui.focusNowButton) ui.focusNowButton.textContent = t("today");
+  if (ui.workspaceStripLabel) ui.workspaceStripLabel.textContent = t("workspace_strip");
+  if (ui.editorPanelLabel) ui.editorPanelLabel.textContent = t("editor_panel_label");
+  if (ui.editorPanelTitle) ui.editorPanelTitle.textContent = t("editor_panel_title");
+  if (ui.editorEmptyState) ui.editorEmptyState.textContent = t("editor_empty");
+  if (ui.eventLibraryLabel) ui.eventLibraryLabel.textContent = t("event_library_label");
+  if (ui.addCustomEventButton) ui.addCustomEventButton.innerHTML = `<span class="add-action-plus">+</span><span>${t("add_event")}</span>`;
+  if (ui.addFolderButton) ui.addFolderButton.innerHTML = `<span class="add-action-plus">+</span><span>${t("add_folder")}</span>`;
+  if (ui.addEpochGroupButton) ui.addEpochGroupButton.innerHTML = `<span class="add-action-plus">+</span><span>${t("add_more")}</span>`;
+  if (ui.importFolderButton) ui.importFolderButton.textContent = t("import");
+  if (ui.searchPanelLabel) ui.searchPanelLabel.textContent = t("search_panel_label");
+  if (ui.searchPanelTitle) ui.searchPanelTitle.textContent = t("search_panel_title");
+  if (ui.searchInput) ui.searchInput.placeholder = t("search_placeholder");
+  if (ui.searchSubmitButton) ui.searchSubmitButton.textContent = t("search_button");
+  if (ui.searchStatus && !state.searchResults.length) ui.searchStatus.textContent = t("search_default");
+}
+
+async function applyLanguage(languageCode) {
+  state.language = I18N[languageCode] ? languageCode : "de";
+  saveLanguagePreference();
+  populateLanguageSelect();
+  applyStaticTranslations();
+  await refreshLocalizedWikidataContent();
+  renderEpochMenu();
+  renderEventList();
+  renderSearchResults();
+  updateSelectionPanel();
+  drawTimeline();
 }
 
 function createSvgElement(tagName, attributes = {}) {
@@ -434,7 +845,8 @@ function yearToEditorValue(year) {
 }
 
 function isTodayKeyword(rawValue) {
-  return String(rawValue ?? "").trim().toLowerCase() === "heute";
+  const normalized = String(rawValue ?? "").trim().toLowerCase();
+  return normalized === "heute" || normalized === "today";
 }
 
 function parseEditorYearValue(rawValue) {
@@ -516,7 +928,7 @@ function getTimelineValueForEventEnd(eventItem) {
 }
 
 function formatBoundaryLabel(eventItem, edge) {
-  if (edge === "end" && eventItem?.endIsToday) return "heute";
+  if (edge === "end" && eventItem?.endIsToday) return t("today_keyword");
   const value = edge === "end" ? getTimelineValueForEventEnd(eventItem) : getTimelineValueForEventStart(eventItem);
   const precision = edge === "end" ? eventItem.endPrecision : eventItem.startPrecision;
   if (!Number.isFinite(value)) return "?";
@@ -529,7 +941,7 @@ function formatBoundaryLabel(eventItem, edge) {
   if (precision >= 10) {
     const date = timelineValueToDate(value);
     if (date) {
-      return `${MONTH_LABELS[date.getUTCMonth()]} ${toHistoricalYear(date.getUTCFullYear())}`;
+      return `${getMonthLabels()[date.getUTCMonth()]} ${toHistoricalYear(date.getUTCFullYear())}`;
     }
   }
   return yearToLabel(value);
@@ -546,7 +958,7 @@ function getTickLabel(value, step, majorTick = false) {
   if (step.unit === "month") {
     const date = timelineValueToDate(value);
     if (date) {
-      return `${MONTH_LABELS[date.getUTCMonth()]} ${toHistoricalYear(date.getUTCFullYear())}`;
+      return `${getMonthLabels()[date.getUTCMonth()]} ${toHistoricalYear(date.getUTCFullYear())}`;
     }
   }
 
@@ -564,7 +976,7 @@ function getGroupById(groupId) {
 function getChildGroups(parentGroupId) {
   return eventGroups
     .filter((groupItem) => groupItem.parentGroupId === parentGroupId)
-    .sort((left, right) => left.title.localeCompare(right.title, "de"));
+    .sort((left, right) => left.title.localeCompare(right.title, getUiSortLocale()));
 }
 
 function getRootGroups() {
@@ -572,15 +984,13 @@ function getRootGroups() {
 }
 
 function getAssignableGroups() {
-  return [...eventGroups].sort((left, right) => left.title.localeCompare(right.title, "de"));
+  return [...eventGroups].sort((left, right) => left.title.localeCompare(right.title, getUiSortLocale()));
 }
 
 function getEventsForGroup(groupId) {
   return timelineEvents
     .filter((eventItem) => eventItem.groupId === groupId)
     .sort((left, right) => {
-      if (left.id === state.openEditorId) return -1;
-      if (right.id === state.openEditorId) return 1;
       const leftYear = Number.isFinite(getTimelineValueForEventStart(left))
         ? getTimelineValueForEventStart(left)
         : Number.POSITIVE_INFINITY;
@@ -595,8 +1005,6 @@ function getUngroupedEvents() {
   return timelineEvents
     .filter((eventItem) => !eventItem.groupId)
     .sort((left, right) => {
-      if (left.id === state.openEditorId) return -1;
-      if (right.id === state.openEditorId) return 1;
       const leftYear = Number.isFinite(getTimelineValueForEventStart(left))
         ? getTimelineValueForEventStart(left)
         : Number.POSITIVE_INFINITY;
@@ -783,7 +1191,7 @@ function getEventDateLabel(eventItem) {
   if (!isRangeEvent(eventItem)) {
     return formatBoundaryLabel(eventItem, "start");
   }
-  return `${formatBoundaryLabel(eventItem, "start")} bis ${formatBoundaryLabel(eventItem, "end")}`;
+  return `${formatBoundaryLabel(eventItem, "start")} ${t("until_connector")} ${formatBoundaryLabel(eventItem, "end")}`;
 }
 
 function getVisibleRange() {
@@ -1224,9 +1632,9 @@ function getMarkerYForLineLane(lane, lineY) {
 
 function getDraggableLanes(eventItem) {
   if (isBarDisplay(eventItem)) {
-    return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, "+0", "-0", -1, -2, -3, -4, -5, -6, -7];
+    return [...POSITIVE_LANES.slice().reverse(), "+0", "-0", ...NEGATIVE_LANES];
   }
-  return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, -1, -2, -3, -4, -5, -6, -7];
+  return [...POSITIVE_LANES.slice().reverse(), ...NEGATIVE_LANES];
 }
 
 function getNearestFixedLaneFromY(pointerY, eventItem) {
@@ -1280,32 +1688,45 @@ function createField(labelText, inputElement) {
   return label;
 }
 
-function focusEditorNameField(kind) {
+function focusEditorNameField(kind, options = {}) {
+  const { reveal = false, behavior = "smooth" } = options;
   window.requestAnimationFrame(() => {
     const selector = kind === "group"
       ? '.group-inline-editor [data-editor-name-field="group"]'
       : '.event-inline-editor [data-editor-name-field="event"]';
     const input = ui.eventList?.querySelector(selector);
     if (!input) return;
-    input.focus();
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
     input.select();
+    if (reveal) {
+      const editor = input.closest(".event-inline-editor");
+      if (!editor) return;
+      const targetTop = Math.max(0, getContainerScrollTopFor(editor) - 32);
+      ui.appFrame.scrollTo({ top: targetTop, behavior });
+    }
   });
 }
 
 function createColorField(labelText, textInput, onColorChange) {
   const label = document.createElement("label");
-  label.className = "field";
+  label.className = "field compact-color-field";
 
-  const titleRow = document.createElement("span");
-  titleRow.className = "field-title-row";
+  const controlsRow = document.createElement("div");
+  controlsRow.className = "compact-color-row";
   const titleText = document.createElement("span");
   titleText.textContent = labelText;
-  titleRow.appendChild(titleText);
+  controlsRow.appendChild(titleText);
 
   const pickerButton = document.createElement("button");
   pickerButton.type = "button";
   pickerButton.className = "color-picker-button";
-  pickerButton.setAttribute("aria-label", `${labelText} auswaehlen`);
+  pickerButton.setAttribute("aria-label", `${labelText} ${t("color_pick_aria")}`);
+  const preview = document.createElement("span");
+  preview.className = "color-preview";
 
   const pickerIcon = document.createElement("span");
   pickerIcon.className = "color-picker-icon";
@@ -1324,6 +1745,13 @@ function createColorField(labelText, textInput, onColorChange) {
   const applyPaletteValue = (value) => {
     textInput.value = value;
     onColorChange(value);
+    updatePreview();
+  };
+
+  const updatePreview = () => {
+    const value = String(textInput.value ?? "").trim();
+    preview.style.background = value || "transparent";
+    preview.classList.toggle("is-empty", !value);
   };
 
   swatches.forEach((value) => {
@@ -1369,9 +1797,107 @@ function createColorField(labelText, textInput, onColorChange) {
     togglePalette();
   });
 
+  textInput.addEventListener("input", updatePreview);
+  textInput.addEventListener("change", updatePreview);
   pickerButton.appendChild(pickerIcon);
-  titleRow.appendChild(pickerButton);
-  label.append(titleRow, textInput, palette);
+  controlsRow.append(textInput, preview, pickerButton);
+  label.append(controlsRow, palette);
+  updatePreview();
+  return label;
+}
+
+function parseLaneValue(rawValue, { allowBarZero = false, allowBarNegativeZero = false, allowInherit = false } = {}) {
+  const normalized = String(rawValue ?? "").trim();
+  if (!normalized) return allowInherit ? undefined : null;
+  if (normalized.toLowerCase() === "auto") return null;
+  if (allowBarZero && normalized === "+0") return "+0";
+  if (allowBarNegativeZero && normalized === "-0") return "-0";
+  const numericValue = Number(normalized);
+  if (!Number.isInteger(numericValue) || numericValue === 0) return null;
+  if (POSITIVE_LANES.includes(numericValue) || NEGATIVE_LANES.includes(numericValue)) return numericValue;
+  return null;
+}
+
+function laneValueToInputString(value) {
+  if (value === undefined) return "";
+  if (value === null) return "auto";
+  return String(value);
+}
+
+function createLaneField(labelText, currentValue, onChange, options = {}) {
+  const {
+    allowBarZero = false,
+    allowBarNegativeZero = false,
+    inheritLabel = "",
+  } = options;
+  const label = document.createElement("label");
+  label.className = "field";
+
+  const title = document.createElement("span");
+  title.textContent = labelText;
+
+  const controls = document.createElement("div");
+  controls.className = "lane-input-wrap";
+
+  const decrementButton = document.createElement("button");
+  decrementButton.type = "button";
+  decrementButton.className = "lane-step-button";
+  decrementButton.textContent = "-";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "lane-text-input";
+  input.placeholder = inheritLabel || "auto";
+  input.value = laneValueToInputString(currentValue);
+
+  const incrementButton = document.createElement("button");
+  incrementButton.type = "button";
+  incrementButton.className = "lane-step-button";
+  incrementButton.textContent = "+";
+
+  const availableLanes = [
+    ...NEGATIVE_LANES,
+    ...(allowBarNegativeZero ? ["-0"] : []),
+    ...(allowBarZero ? ["+0"] : []),
+    ...POSITIVE_LANES,
+  ];
+
+  const commitInputValue = () => {
+    const nextValue = parseLaneValue(input.value, {
+      allowBarZero,
+      allowBarNegativeZero,
+      allowInherit: true,
+    });
+    onChange(nextValue);
+    input.value = laneValueToInputString(nextValue);
+  };
+
+  const stepLane = (direction) => {
+    const parsed = parseLaneValue(input.value, {
+      allowBarZero,
+      allowBarNegativeZero,
+      allowInherit: true,
+    });
+    if (parsed === undefined || parsed === null) {
+      input.value = direction > 0
+        ? (allowBarZero ? "+0" : "1")
+        : (allowBarNegativeZero ? "-0" : "-1");
+      commitInputValue();
+      return;
+    }
+    const currentIndex = availableLanes.findIndex((lane) => lane === parsed);
+    if (currentIndex === -1) return;
+    const nextIndex = Math.max(0, Math.min(availableLanes.length - 1, currentIndex + direction));
+    input.value = laneValueToInputString(availableLanes[nextIndex]);
+    commitInputValue();
+  };
+
+  decrementButton.addEventListener("click", () => stepLane(-1));
+  incrementButton.addEventListener("click", () => stepLane(1));
+  input.addEventListener("change", commitInputValue);
+
+  controls.append(decrementButton, input, incrementButton);
+  label.append(title, controls);
   return label;
 }
 
@@ -1379,7 +1905,7 @@ function appendZoomOptions(selectElement, currentValue, inheritLabel) {
   if (inheritLabel) {
     selectElement.appendChild(createSelectOption("__inherit__", inheritLabel, currentValue === undefined));
   }
-  selectElement.appendChild(createSelectOption("__all__", "keine Einschraenkung", currentValue === null));
+  selectElement.appendChild(createSelectOption("__all__", t("no_limit"), currentValue === null));
   scaleSteps.forEach((step) => {
     selectElement.appendChild(createSelectOption(step.id, stepToLabel(step), currentValue === step.years));
   });
@@ -1390,16 +1916,16 @@ function appendLaneOptions(selectElement, currentValue, inheritLabel, options = 
   if (inheritLabel) {
     selectElement.appendChild(createSelectOption("__inherit__", inheritLabel, currentValue === undefined));
   }
-  selectElement.appendChild(createSelectOption("__auto__", "Automatisch", currentValue === null));
+  selectElement.appendChild(createSelectOption("__auto__", t("automatic"), currentValue === null));
   if (allowBarZero && mode === "bar") {
-    selectElement.appendChild(createSelectOption("+0", "+0 fuer Balken", currentValue === "+0"));
+    selectElement.appendChild(createSelectOption("+0", t("bar_upper_zero"), currentValue === "+0"));
   }
   if (allowBarNegativeZero && mode === "bar") {
-    selectElement.appendChild(createSelectOption("-0", "-0 unterhalb", currentValue === "-0"));
+    selectElement.appendChild(createSelectOption("-0", t("bar_lower_zero"), currentValue === "-0"));
   }
-  const lanes = [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const lanes = [...NEGATIVE_LANES, ...POSITIVE_LANES];
   lanes.forEach((lane) => {
-    const label = lane > 0 ? `+${lane} oberhalb` : `${lane} unterhalb`;
+    const label = lane > 0 ? `+${lane} ${t("above_suffix")}` : `${lane} ${t("below_suffix")}`;
     selectElement.appendChild(createSelectOption(lane, label, currentValue === lane));
   });
 }
@@ -1440,9 +1966,9 @@ function createEmptyEvent() {
     lane: undefined,
     displayMode: "line",
     color: undefined,
-    title: "Neues Ereignis",
+    title: t("new_event"),
     description: "",
-    category: "Eigenes Ereignis",
+    category: "",
     groupId: null,
     parentEventId: null,
     relationLineStyle: "none",
@@ -1457,7 +1983,7 @@ function createEmptyGroup(parentGroupId = null) {
     kind: "custom-folder",
     source: "custom",
     sourceId: null,
-    title: "Neuer Ordner",
+    title: t("new_folder"),
     description: "",
     parentGroupId,
     expanded: true,
@@ -1480,7 +2006,7 @@ function getGroupExportFilename(groupItem) {
   const safeTitle = String(groupItem.title || "ordner")
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9äöüß_-]+/gi, "-")
+    .replace(/[^a-z0-9_-]+/gi, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
   return `${safeTitle || "ordner"}.timemap.json`;
@@ -1565,10 +2091,10 @@ function downloadFolderExport(groupId) {
   link.click();
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
-  ui.eventBrowserInfo.textContent = `Ordner ${groupItem.title} wurde als JSON exportiert.`;
+  ui.eventBrowserInfo.textContent = tf("folder_exported", { title: groupItem.title });
 }
 
-function importFolderPayload(payload) {
+async function importFolderPayload(payload) {
   if (!payload || payload.type !== "timemap-folder-export" || !Array.isArray(payload.groups) || !Array.isArray(payload.events)) {
     throw new Error("ungueltiges-format");
   }
@@ -1624,13 +2150,20 @@ function importFolderPayload(payload) {
     importedRootGroup.expanded = true;
     state.openEditorId = null;
     state.openGroupEditorId = importedRootGroup.id;
-    ui.eventBrowserInfo.textContent = `Ordner ${importedRootGroup.title} wurde importiert.`;
+  }
+  await refreshLocalizedWikidataContent();
+  if (importedRootGroup) {
+    ui.eventBrowserInfo.textContent = tf("folder_imported", { title: importedRootGroup.title });
   } else {
-    ui.eventBrowserInfo.textContent = "Ordner wurde importiert.";
+    ui.eventBrowserInfo.textContent = t("folder_imported_generic");
   }
   renderEpochMenu();
   renderEventList();
   drawTimeline();
+  if (importedRootGroup) {
+    scrollToDetails("auto");
+    focusEditorNameField("group", { reveal: true, behavior: "auto" });
+  }
 }
 
 function createEarthHistoryPreset() {
@@ -1727,7 +2260,7 @@ function showTooltip(eventItem, anchorX, markerY) {
   const meta = document.createElement("span");
   meta.textContent = getEventDateLabel(eventItem);
   const description = document.createElement("span");
-  description.textContent = eventItem.description || "Keine Beschreibung vorhanden.";
+  description.textContent = eventItem.description || t("no_description");
   ui.eventTooltip.append(title, meta, description);
   ui.eventTooltip.hidden = false;
 
@@ -1768,17 +2301,17 @@ function updateSelectionPanel() {
   }
   const eventItem = getEventById(state.selectedEventId);
   if (!eventItem) {
-    ui.eventTitle.textContent = "Kein Ereignis ausgewaehlt";
+    ui.eventTitle.textContent = t("no_event_selected");
     ui.eventYear.textContent = "-";
-    ui.eventDescription.textContent = "Klicke auf einen Marker auf dem Zeitstrahl oder fuege rechts ein Wikidata-Element hinzu.";
+    ui.eventDescription.textContent = t("click_marker_hint");
     return;
   }
   ui.eventTitle.textContent = eventItem.title;
   ui.eventYear.textContent = Number.isFinite(eventItem.startYear)
     || Number.isFinite(eventItem.startDateValue)
     ? getEventDateLabel(eventItem)
-    : "Jahresdaten fehlen";
-  ui.eventDescription.textContent = eventItem.description || "Keine Beschreibung vorhanden.";
+    : t("no_year_data");
+  ui.eventDescription.textContent = eventItem.description || t("no_description");
 }
 
 function selectEvent(eventId, openEditor = false) {
@@ -1846,6 +2379,27 @@ function toggleWorkspace() {
   openWorkspace();
 }
 
+function setTimelineMenuOpen(isOpen) {
+  state.timelineMenuOpen = Boolean(isOpen);
+  if (ui.timelineSideMenu) {
+    ui.timelineSideMenu.classList.toggle("is-open", state.timelineMenuOpen);
+    ui.timelineSideMenu.setAttribute("aria-hidden", String(!state.timelineMenuOpen));
+  }
+  if (ui.timelineMenuOverlay) {
+    ui.timelineMenuOverlay.hidden = !state.timelineMenuOpen;
+  }
+  if (ui.timelineMenuButton) {
+    ui.timelineMenuButton.setAttribute("aria-expanded", String(state.timelineMenuOpen));
+  }
+}
+
+function toggleTimelineMenu(event) {
+  if (event) {
+    event.preventDefault();
+  }
+  setTimelineMenuOpen(!state.timelineMenuOpen);
+}
+
 function handleWorkspaceStripOpen(event, behavior = "smooth") {
   if (event) {
     if (event.target?.closest?.("#fullscreenButton")) return;
@@ -1868,6 +2422,28 @@ async function toggleFullscreen(event) {
   } catch {
     // Some embedded browsers can block fullscreen; in that case the F11 fallback still works.
   }
+}
+
+function toggleTodayFocus() {
+  hideTooltip();
+  state.centerYear = getNowTimelineValue();
+  state.showTodayMarker = !state.showTodayMarker;
+  clearSelectedEvent();
+}
+
+function isTextEditingElement(element) {
+  if (!element) return false;
+  const tagName = element.tagName?.toLowerCase?.();
+  return tagName === "input"
+    || tagName === "textarea"
+    || tagName === "select"
+    || Boolean(element.isContentEditable);
+}
+
+function isTimelineWindowActive() {
+  if (!ui.appFrame || !ui.detailsView) return true;
+  const detailsTop = getContainerScrollTopFor(ui.detailsView);
+  return ui.appFrame.scrollTop < Math.max(80, detailsTop - 120);
 }
 
 function handleEventDragMove(event) {
@@ -2053,7 +2629,7 @@ function drawTimeline() {
       cx: x, cy: lineY, r: majorTick ? 4.8 : 3.2, fill: tickFill,
       tabindex: 0,
       role: "button",
-      "aria-label": `Achsenpunkt ${getTickLabel(tick.year, step, majorTick)}`,
+      "aria-label": `${t("axis_point")} ${getTickLabel(tick.year, step, majorTick)}`,
       cursor: "pointer",
     });
     tickCircle.addEventListener("click", (event) => {
@@ -2275,6 +2851,16 @@ function createInlineEditor(eventItem) {
   normalizeEventDisplaySettings(eventItem);
   const editor = document.createElement("div");
   editor.className = "event-inline-editor";
+  const rerenderEditor = ({ updateSelection = false, redrawTimeline = true, rerenderSearch = false } = {}) => {
+    const scrollTop = ui.appFrame.scrollTop;
+    if (updateSelection && state.selectedEventId === eventItem.id) updateSelectionPanel();
+    renderEventList();
+    if (rerenderSearch) renderSearchResults();
+    if (redrawTimeline) drawTimeline();
+    requestAnimationFrame(() => {
+      ui.appFrame.scrollTop = scrollTop;
+    });
+  };
 
   const titleInput = document.createElement("input");
   titleInput.type = "text";
@@ -2282,26 +2868,22 @@ function createInlineEditor(eventItem) {
   titleInput.value = eventItem.title;
   titleInput.addEventListener("change", () => {
     eventItem.title = titleInput.value.trim() || eventItem.title;
-    if (state.selectedEventId === eventItem.id) updateSelectionPanel();
-    renderEventList();
-    drawTimeline();
+    rerenderEditor({ updateSelection: true });
   });
 
   const categoryInput = document.createElement("input");
   categoryInput.type = "text";
   categoryInput.value = eventItem.category === "Wikidata" ? "" : eventItem.category;
   categoryInput.addEventListener("change", async () => {
-    eventItem.category = categoryInput.value.trim() || "Unkategorisiert";
+    eventItem.category = categoryInput.value.trim() || t("uncategorized");
     if (isFlagCategory(eventItem.category)) {
       await ensureEventFlag(eventItem);
     }
-    if (state.selectedEventId === eventItem.id) updateSelectionPanel();
-    renderEventList();
-    drawTimeline();
+    rerenderEditor({ updateSelection: true });
   });
 
   const groupSelect = document.createElement("select");
-  groupSelect.appendChild(createSelectOption("", "keinem Ordner zugeordnet", eventItem.groupId == null));
+  groupSelect.appendChild(createSelectOption("", t("no_folder_assigned"), eventItem.groupId == null));
   getAssignableGroups().forEach((groupItem) => {
     const prefix = "· ".repeat(getGroupDepth(groupItem.id));
     groupSelect.appendChild(createSelectOption(groupItem.id, `${prefix}${groupItem.title}`, eventItem.groupId === groupItem.id));
@@ -2316,7 +2898,7 @@ function createInlineEditor(eventItem) {
       const groupItem = getGroupById(eventItem.groupId);
       if (groupItem) groupItem.expanded = true;
     }
-    renderEventList();
+    rerenderEditor();
   });
 
   const rangeCheckbox = document.createElement("input");
@@ -2328,38 +2910,38 @@ function createInlineEditor(eventItem) {
   startInput.type = "text";
   startInput.inputMode = "text";
   startInput.value = yearToEditorValue(eventItem.startYear);
-  startInput.placeholder = "z. B. 1789 oder -66 Ma";
+  startInput.placeholder = t("example_start");
 
   const endInput = document.createElement("input");
   endInput.type = "text";
   endInput.inputMode = "text";
-  endInput.value = eventItem.endIsToday ? "heute" : yearToEditorValue(storedEndYear);
-  endInput.placeholder = "z. B. 1799, -65 Ma oder heute";
+  endInput.value = eventItem.endIsToday ? t("today_keyword") : yearToEditorValue(storedEndYear);
+  endInput.placeholder = t("example_end");
 
   const startLabelText = document.createElement("span");
-  startLabelText.textContent = rangeCheckbox.checked ? "Von" : "Jahr";
+  startLabelText.textContent = rangeCheckbox.checked ? t("from") : t("year");
 
   const startField = document.createElement("label");
   startField.className = "field";
   startField.append(startLabelText, startInput);
 
   const endLabelText = document.createElement("span");
-  endLabelText.textContent = "Bis";
+  endLabelText.textContent = t("until");
 
   const endField = document.createElement("label");
   endField.className = "field";
   endField.append(endLabelText, endInput);
 
   const updateRangeUi = () => {
-    startLabelText.textContent = rangeCheckbox.checked ? "Von" : "Jahr";
+    startLabelText.textContent = rangeCheckbox.checked ? t("from") : t("year");
     endField.hidden = false;
     endField.classList.toggle("is-disabled", !rangeCheckbox.checked);
     endInput.disabled = !rangeCheckbox.checked;
     endInput.tabIndex = rangeCheckbox.checked ? 0 : -1;
     if (!rangeCheckbox.checked) {
-      endInput.value = eventItem.endIsToday ? "heute" : yearToEditorValue(storedEndYear);
+      endInput.value = eventItem.endIsToday ? t("today_keyword") : yearToEditorValue(storedEndYear);
     } else if (eventItem.endIsToday && !String(endInput.value).trim()) {
-      endInput.value = "heute";
+      endInput.value = t("today_keyword");
     } else if (Number.isFinite(storedEndYear) && !String(endInput.value).trim()) {
       endInput.value = yearToEditorValue(storedEndYear);
     }
@@ -2389,13 +2971,11 @@ function createInlineEditor(eventItem) {
     normalizeEventDisplaySettings(eventItem);
     startInput.value = yearToEditorValue(eventItem.startYear);
     if (rangeCheckbox.checked) {
-      endInput.value = eventItem.endIsToday ? "heute" : yearToEditorValue(eventItem.endYear);
+      endInput.value = eventItem.endIsToday ? t("today_keyword") : yearToEditorValue(eventItem.endYear);
     }
     updateRangeUi();
     rebuildLaneOptions();
-    if (state.selectedEventId === eventItem.id) updateSelectionPanel();
-    renderEventList();
-    drawTimeline();
+    rerenderEditor({ updateSelection: true });
   };
 
   rangeCheckbox.addEventListener("change", applyYearChanges);
@@ -2408,14 +2988,13 @@ function createInlineEditor(eventItem) {
   descriptionArea.value = eventItem.description;
   descriptionArea.addEventListener("change", () => {
     eventItem.description = descriptionArea.value.trim();
-    if (state.selectedEventId === eventItem.id) updateSelectionPanel();
-    renderEventList();
+    rerenderEditor({ updateSelection: true, redrawTimeline: false });
   });
 
   const checkboxLabel = document.createElement("label");
   checkboxLabel.className = "field switch-field";
   const checkboxText = document.createElement("span");
-  checkboxText.textContent = "Zeitraum statt Punkt";
+  checkboxText.textContent = t("range_instead_of_point");
   const switchTrack = document.createElement("span");
   switchTrack.className = "switch-track";
   const switchThumb = document.createElement("span");
@@ -2424,10 +3003,10 @@ function createInlineEditor(eventItem) {
   checkboxLabel.append(checkboxText, rangeCheckbox, switchTrack);
 
   const zoomMinSelect = document.createElement("select");
-  appendZoomOptions(zoomMinSelect, eventItem.visibleStepMin, "vom Ordner erben");
+  appendZoomOptions(zoomMinSelect, eventItem.visibleStepMin, t("inherit_folder"));
 
   const zoomMaxSelect = document.createElement("select");
-  appendZoomOptions(zoomMaxSelect, eventItem.visibleStepMax, "vom Ordner erben");
+  appendZoomOptions(zoomMaxSelect, eventItem.visibleStepMax, t("inherit_folder"));
 
   const applyZoomVisibility = () => {
     const min = getSelectSettingValue(zoomMinSelect.value);
@@ -2440,8 +3019,7 @@ function createInlineEditor(eventItem) {
       zoomMinSelect.value = getZoomOptionValue(eventItem.visibleStepMin);
       zoomMaxSelect.value = getZoomOptionValue(eventItem.visibleStepMax);
     }
-    renderEventList();
-    drawTimeline();
+    rerenderEditor();
   };
 
   zoomMinSelect.addEventListener("change", applyZoomVisibility);
@@ -2450,53 +3028,56 @@ function createInlineEditor(eventItem) {
   const zoomRow = document.createElement("div");
   zoomRow.className = "field-row year-fields";
   zoomRow.append(
-    createField("Sichtbar von", zoomMinSelect),
-    createField("bis", zoomMaxSelect),
+    createField(t("visible_from"), zoomMinSelect),
+    createField(t("until").toLowerCase(), zoomMaxSelect),
   );
 
   const relationParentSelect = document.createElement("select");
-  relationParentSelect.appendChild(createSelectOption("", "keine Zuordnung", eventItem.parentEventId == null));
+  relationParentSelect.appendChild(createSelectOption("", t("relation_none"), eventItem.parentEventId == null));
   getAssignableParentEvents(eventItem).forEach((candidate) => {
     relationParentSelect.appendChild(createSelectOption(candidate.id, candidate.title, eventItem.parentEventId === candidate.id));
   });
   relationParentSelect.addEventListener("change", () => {
     eventItem.parentEventId = relationParentSelect.value || null;
-    renderEventList();
-    drawTimeline();
+    rerenderEditor();
   });
 
   const relationStyleSelect = document.createElement("select");
   relationStyleSelect.append(
-    createSelectOption("none", "keine", eventItem.relationLineStyle === "none"),
-    createSelectOption("solid", "durchgezogen", eventItem.relationLineStyle === "solid"),
-    createSelectOption("dotted", "gepunktet", eventItem.relationLineStyle === "dotted"),
+    createSelectOption("none", t("line_none"), eventItem.relationLineStyle === "none"),
+    createSelectOption("solid", t("line_solid"), eventItem.relationLineStyle === "solid"),
+    createSelectOption("dotted", t("line_dotted"), eventItem.relationLineStyle === "dotted"),
   );
   relationStyleSelect.addEventListener("change", () => {
+    const previousStyle = eventItem.relationLineStyle;
     eventItem.relationLineStyle = relationStyleSelect.value;
-    drawTimeline();
+    if (previousStyle === "none" && eventItem.relationLineStyle !== "none") {
+      eventItem.relationDirection = "none";
+    }
+    rerenderEditor({ redrawTimeline: true });
   });
 
   const relationDirectionSelect = document.createElement("select");
   relationDirectionSelect.append(
-    createSelectOption("parent-to-child", "Pfeil nach unten / rechts", eventItem.relationDirection === "parent-to-child"),
-    createSelectOption("child-to-parent", "Pfeil nach oben / links", eventItem.relationDirection === "child-to-parent"),
-    createSelectOption("both", "beidseitig", eventItem.relationDirection === "both"),
-    createSelectOption("none", "ohne Pfeil", eventItem.relationDirection === "none"),
+    createSelectOption("parent-to-child", t("arrow_down_right"), eventItem.relationDirection === "parent-to-child"),
+    createSelectOption("child-to-parent", t("arrow_up_left"), eventItem.relationDirection === "child-to-parent"),
+    createSelectOption("both", t("arrow_both"), eventItem.relationDirection === "both"),
+    createSelectOption("none", t("arrow_none"), eventItem.relationDirection === "none"),
   );
   relationDirectionSelect.addEventListener("change", () => {
     eventItem.relationDirection = relationDirectionSelect.value;
-    drawTimeline();
+    rerenderEditor({ redrawTimeline: true });
   });
 
   const relationRow = document.createElement("div");
   relationRow.className = "field-row year-fields";
-  const relationStyleField = createField("Linie", relationStyleSelect);
-  const relationDirectionField = createField("Pfeile", relationDirectionSelect);
+  const relationStyleField = createField(t("line"), relationStyleSelect);
+  const relationDirectionField = createField(t("arrows"), relationDirectionSelect);
   relationRow.append(
     relationStyleField,
     relationDirectionField,
   );
-  const relationField = createField("Zuordnung", relationParentSelect);
+  const relationField = createField(t("relation"), relationParentSelect);
 
   const updateRelationEditorState = () => {
     const hasGroup = Boolean(eventItem.groupId);
@@ -2511,19 +3092,23 @@ function createInlineEditor(eventItem) {
   };
 
   const displaySelect = document.createElement("select");
-  displaySelect.appendChild(createSelectOption("line", "Strecke", eventItem.displayMode !== "bar"));
-  displaySelect.appendChild(createSelectOption("bar", "Balken", eventItem.displayMode === "bar"));
+  displaySelect.appendChild(createSelectOption("line", t("display_line"), eventItem.displayMode !== "bar"));
+  displaySelect.appendChild(createSelectOption("bar", t("display_bar"), eventItem.displayMode === "bar"));
 
-  const laneSelect = document.createElement("select");
-  const rebuildLaneOptions = () => {
-    laneSelect.replaceChildren();
-    appendLaneOptions(laneSelect, eventItem.lane, "vom Ordner erben", {
+  let laneField = createLaneField(
+    t("display_height"),
+    eventItem.lane,
+    (nextValue) => {
+      eventItem.lane = nextValue;
+      normalizeEventDisplaySettings(eventItem);
+      rerenderEditor();
+    },
+    {
       allowBarZero: eventItem.displayMode === "bar" && isRangeEvent(eventItem),
       allowBarNegativeZero: eventItem.displayMode === "bar" && isRangeEvent(eventItem),
-      mode: eventItem.displayMode === "bar" ? "bar" : "line",
-    });
-  };
-  rebuildLaneOptions();
+      inheritLabel: t("inherit_folder"),
+    },
+  );
 
   displaySelect.addEventListener("change", () => {
     eventItem.displayMode = displaySelect.value === "bar" ? "bar" : "line";
@@ -2532,26 +3117,16 @@ function createInlineEditor(eventItem) {
       colorInput.value = BAR_DEFAULT_COLOR;
     }
     normalizeEventDisplaySettings(eventItem);
-    rebuildLaneOptions();
-    renderEventList();
-    drawTimeline();
-  });
-
-  laneSelect.addEventListener("change", () => {
-    eventItem.lane = getSelectSettingValue(laneSelect.value);
-    normalizeEventDisplaySettings(eventItem);
-    renderEventList();
-    drawTimeline();
+    rerenderEditor();
   });
 
   const colorInput = document.createElement("input");
   colorInput.type = "text";
-  colorInput.placeholder = "vom Ordner erben oder z. B. #6f8f52";
+  colorInput.placeholder = t("example_color");
   colorInput.value = eventItem.color ?? "";
   const applyEventColorChange = (value = colorInput.value) => {
     eventItem.color = String(value).trim() || undefined;
-    renderEventList();
-    drawTimeline();
+    rerenderEditor();
   };
   colorInput.addEventListener("change", () => {
     applyEventColorChange(colorInput.value);
@@ -2561,19 +3136,25 @@ function createInlineEditor(eventItem) {
   yearRow.className = "field-row year-fields";
   yearRow.append(startField, endField);
 
+  const displayRow = document.createElement("div");
+  displayRow.className = "field-row year-fields";
+  displayRow.append(
+    createField(t("display"), displaySelect),
+    laneField,
+  );
+
   editor.append(
-    createField("Titel", titleInput),
-    createField("Kategorie", categoryInput),
-    createField("Ordner / Epoche", groupSelect),
-    relationField,
-    relationRow,
+    createField(t("title"), titleInput),
+    createField(t("category"), categoryInput),
+    createField(t("folder_or_epoch"), groupSelect),
     checkboxLabel,
     yearRow,
     zoomRow,
-    createField("Darstellung", displaySelect),
-    createField("Darstellungshoehe", laneSelect),
-    createColorField("Farbwert", colorInput, applyEventColorChange),
-    createField("Beschreibung", descriptionArea),
+    displayRow,
+    relationField,
+    relationRow,
+    createColorField(t("color_value"), colorInput, applyEventColorChange),
+    createField(t("description"), descriptionArea),
   );
   updateRelationEditorState();
   relationParentSelect.addEventListener("change", () => {
@@ -2601,7 +3182,7 @@ function renderEpochMenu() {
   const title = document.createElement("strong");
   title.textContent = EARTH_HISTORY_PRESET.title;
   const note = document.createElement("span");
-  note.textContent = "enthaelt Aeon, Aera, Periode und Epoche aus der lokalen Referenz";
+  note.textContent = t("contains_earth_history");
   main.append(title, note);
 
   const source = document.createElement("span");
@@ -2615,7 +3196,7 @@ function renderEpochMenu() {
     main.disabled = true;
     const added = document.createElement("span");
     added.className = "group-row-source";
-    added.textContent = "bereits angelegt";
+    added.textContent = t("already_created");
     row.append(main, source, added);
   } else {
     main.addEventListener("click", async () => {
@@ -2630,14 +3211,14 @@ function renderEpochMenu() {
       renderEventList();
       renderSearchResults();
       drawTimeline();
-      ui.eventBrowserInfo.textContent = `Lade Zeitraeume fuer ${EARTH_HISTORY_PRESET.title} aus Wikidata ...`;
+      ui.eventBrowserInfo.textContent = tf("loading_ranges_for", { title: EARTH_HISTORY_PRESET.title });
 
       try {
         await hydrateEventsFromWikidata(preset.events);
         renderEventList();
         drawTimeline();
       } catch {
-        ui.eventBrowserInfo.textContent = `Zeitraeume fuer ${EARTH_HISTORY_PRESET.title} konnten nicht automatisch geladen werden.`;
+        ui.eventBrowserInfo.textContent = tf("loading_ranges_failed", { title: EARTH_HISTORY_PRESET.title });
         renderEventList();
       }
     });
@@ -2648,12 +3229,32 @@ function renderEpochMenu() {
   ui.epochMenu.appendChild(item);
 }
 
+function hasOpenEventBranch(eventId) {
+  const eventItem = getEventById(eventId);
+  if (!eventItem) return false;
+  if (state.openEditorId === eventId || eventItem.expanded) return true;
+  return timelineEvents
+    .filter((candidate) => candidate.parentEventId === eventId)
+    .some((candidate) => hasOpenEventBranch(candidate.id));
+}
+
+function hasOpenGroupBranch(groupId) {
+  const groupItem = getGroupById(groupId);
+  if (!groupItem) return false;
+  if (state.openGroupEditorId === groupId || groupItem.expanded) return true;
+  return getChildGroups(groupId).some((candidate) => hasOpenGroupBranch(candidate.id))
+    || getEventsForGroup(groupId)
+      .filter((candidate) => candidate.parentEventId == null)
+      .some((candidate) => hasOpenEventBranch(candidate.id));
+}
+
 function createEventBrowserItem(eventItem, options = {}) {
-  const { child = false, depth = 0 } = options;
+  const { child = false, depth = 0, muted = false } = options;
   const item = document.createElement("div");
   item.className = "event-browser-item";
   if (child) item.classList.add("is-child");
   if (state.openEditorId === eventItem.id) item.classList.add("is-open");
+  if (muted) item.classList.add("is-focus-muted");
   item.style.setProperty("--tree-depth", String(depth));
 
   const row = document.createElement("div");
@@ -2699,12 +3300,17 @@ function createEventBrowserItem(eventItem, options = {}) {
   });
   const childEvents = getEventsForGroup(eventItem.groupId).filter((candidate) => candidate.parentEventId === eventItem.id);
   const hasChildEvents = childEvents.length > 0;
+  const contextOpen = eventItem.expanded && hasChildEvents;
+  const controlsMuted = muted || contextOpen;
+  if (contextOpen) item.classList.add("is-context-open");
+  row.draggable = Boolean(eventItem.groupId) && !controlsMuted;
 
   const checkWrap = document.createElement("label");
   checkWrap.className = "event-row-check";
   const enabledCheckbox = document.createElement("input");
   enabledCheckbox.type = "checkbox";
   enabledCheckbox.checked = eventItem.enabled;
+  enabledCheckbox.disabled = controlsMuted;
   enabledCheckbox.addEventListener("change", () => {
     eventItem.enabled = enabledCheckbox.checked;
     if (!eventItem.enabled && state.selectedEventId === eventItem.id) {
@@ -2723,8 +3329,8 @@ function createEventBrowserItem(eventItem, options = {}) {
   toggleButton.type = "button";
   toggleButton.className = "tree-row-toggle";
   toggleButton.textContent = hasChildEvents ? (eventItem.expanded ? "▾" : "▸") : "";
-  toggleButton.disabled = !hasChildEvents;
-  toggleButton.setAttribute("aria-label", hasChildEvents ? "Untergeordnete Ereignisse anzeigen" : "");
+  toggleButton.disabled = !hasChildEvents || muted;
+  toggleButton.setAttribute("aria-label", hasChildEvents ? t("show_child_events") : "");
   toggleButton.addEventListener("click", (event) => {
     event.stopPropagation();
     if (!hasChildEvents) return;
@@ -2735,6 +3341,7 @@ function createEventBrowserItem(eventItem, options = {}) {
   const main = document.createElement("button");
   main.type = "button";
   main.className = "event-row-main";
+  main.disabled = controlsMuted;
   main.addEventListener("click", () => {
     state.selectedEventId = eventItem.id;
     state.openGroupEditorId = null;
@@ -2753,7 +3360,7 @@ function createEventBrowserItem(eventItem, options = {}) {
   if (!Number.isFinite(getTimelineValueForEventStart(eventItem))) {
     const warning = document.createElement("span");
     warning.className = "event-row-warning";
-    warning.textContent = "Warnung: Jahresdaten fehlen";
+    warning.textContent = t("warning_missing_year_data");
     main.append(warning);
   }
 
@@ -2765,6 +3372,7 @@ function createEventBrowserItem(eventItem, options = {}) {
   deleteButton.type = "button";
   deleteButton.className = "event-row-delete";
   deleteButton.textContent = "X";
+  deleteButton.disabled = controlsMuted;
   deleteButton.addEventListener("click", () => {
     const index = timelineEvents.findIndex((candidate) => candidate.id === eventItem.id);
     if (index === -1) return;
@@ -2797,6 +3405,14 @@ function createEventBrowserItem(eventItem, options = {}) {
 function createGroupInlineEditor(groupItem) {
   const editor = document.createElement("div");
   editor.className = "event-inline-editor group-inline-editor";
+  const rerenderGroupEditor = ({ redrawTimeline = true } = {}) => {
+    const scrollTop = ui.appFrame.scrollTop;
+    renderEventList();
+    if (redrawTimeline) drawTimeline();
+    requestAnimationFrame(() => {
+      ui.appFrame.scrollTop = scrollTop;
+    });
+  };
 
   const titleInput = document.createElement("input");
   titleInput.type = "text";
@@ -2804,14 +3420,14 @@ function createGroupInlineEditor(groupItem) {
   titleInput.value = groupItem.title;
   titleInput.addEventListener("change", () => {
     groupItem.title = titleInput.value.trim() || groupItem.title;
-    renderEventList();
+    rerenderGroupEditor({ redrawTimeline: false });
   });
 
   const zoomMinSelect = document.createElement("select");
-  appendZoomOptions(zoomMinSelect, groupItem.visibleStepMin, "keine Vorgabe");
+  appendZoomOptions(zoomMinSelect, groupItem.visibleStepMin, t("no_default"));
 
   const zoomMaxSelect = document.createElement("select");
-  appendZoomOptions(zoomMaxSelect, groupItem.visibleStepMax, "keine Vorgabe");
+  appendZoomOptions(zoomMaxSelect, groupItem.visibleStepMax, t("no_default"));
 
   const applyZoomVisibility = () => {
     const min = getSelectSettingValue(zoomMinSelect.value);
@@ -2824,32 +3440,32 @@ function createGroupInlineEditor(groupItem) {
       zoomMinSelect.value = getZoomOptionValue(groupItem.visibleStepMin);
       zoomMaxSelect.value = getZoomOptionValue(groupItem.visibleStepMax);
     }
-    renderEventList();
-    drawTimeline();
+    rerenderGroupEditor();
   };
   zoomMinSelect.addEventListener("change", applyZoomVisibility);
   zoomMaxSelect.addEventListener("change", applyZoomVisibility);
 
-  const laneSelect = document.createElement("select");
-  appendLaneOptions(laneSelect, groupItem.lane, "keine Vorgabe", {
-    allowBarZero: true,
-    allowBarNegativeZero: true,
-    mode: "bar",
-  });
-  laneSelect.addEventListener("change", () => {
-    groupItem.lane = getSelectSettingValue(laneSelect.value);
-    renderEventList();
-    drawTimeline();
-  });
+  const laneField = createLaneField(
+    t("folder_display_height"),
+    groupItem.lane,
+    (nextValue) => {
+      groupItem.lane = nextValue;
+      rerenderGroupEditor();
+    },
+    {
+      allowBarZero: true,
+      allowBarNegativeZero: true,
+      inheritLabel: t("no_default"),
+    },
+  );
 
   const colorInput = document.createElement("input");
   colorInput.type = "text";
-  colorInput.placeholder = "z. B. #6f8f52";
+  colorInput.placeholder = t("example_group_color");
   colorInput.value = groupItem.color ?? "";
   const applyGroupColorChange = (value = colorInput.value) => {
     groupItem.color = String(value).trim() || undefined;
-    renderEventList();
-    drawTimeline();
+    rerenderGroupEditor();
   };
   colorInput.addEventListener("change", () => {
     applyGroupColorChange(colorInput.value);
@@ -2858,32 +3474,39 @@ function createGroupInlineEditor(groupItem) {
   const zoomRow = document.createElement("div");
   zoomRow.className = "field-row year-fields";
   zoomRow.append(
-    createField("Standard sichtbar von", zoomMinSelect),
-    createField("bis", zoomMaxSelect),
+    createField(t("standard_visible_from"), zoomMinSelect),
+    createField(t("until").toLowerCase(), zoomMaxSelect),
   );
 
   editor.append(
-    createField("Ordnername", titleInput),
+    createField(t("folder_name"), titleInput),
     zoomRow,
-    createField("Standard-Darstellungshoehe", laneSelect),
-    createColorField("Standard-Farbwert", colorInput, applyGroupColorChange),
+    laneField,
+    createColorField(t("folder_color_value"), colorInput, applyGroupColorChange),
   );
   return editor;
 }
 
-function buildEventHierarchy(groupId, parentEventId = null, depth = 0) {
-  return getEventsForGroup(groupId)
-    .filter((eventItem) => (eventItem.parentEventId ?? null) === parentEventId)
-    .flatMap((eventItem) => ([
-      { eventItem, depth },
-      ...(eventItem.expanded ? buildEventHierarchy(groupId, eventItem.id, depth + 1) : []),
-    ]));
+function buildEventHierarchy(groupId, parentEventId = null, depth = 0, inheritedMuted = false) {
+  const directChildren = getEventsForGroup(groupId)
+    .filter((eventItem) => (eventItem.parentEventId ?? null) === parentEventId);
+  const activeChildId = directChildren.find((eventItem) => hasOpenEventBranch(eventItem.id))?.id ?? null;
+
+  return directChildren.flatMap((eventItem) => {
+    const ownMuted = inheritedMuted || (activeChildId != null && activeChildId !== eventItem.id);
+    return [
+      { eventItem, depth, muted: ownMuted },
+      ...(eventItem.expanded ? buildEventHierarchy(groupId, eventItem.id, depth + 1, ownMuted) : []),
+    ];
+  });
 }
 
-function createGroupBrowserItem(groupItem) {
+function createGroupBrowserItem(groupItem, options = {}) {
+  const { muted = false } = options;
   const container = document.createElement("div");
   container.className = "group-browser-item";
   if (groupItem.parentGroupId) container.classList.add("is-child-group");
+  if (muted) container.classList.add("is-focus-muted");
   container.style.setProperty("--tree-depth", String(Math.max(0, getGroupDepth(groupItem.id) - 1)));
 
   const row = document.createElement("div");
@@ -2911,6 +3534,12 @@ function createGroupBrowserItem(groupItem) {
     renderEventList();
     drawTimeline();
   });
+  const directChildGroups = getChildGroups(groupItem.id);
+  const directEventEntries = getEventsForGroup(groupItem.id).filter((eventItem) => eventItem.parentEventId == null);
+  const hasVisibleChildren = directChildGroups.length > 0 || directEventEntries.length > 0;
+  const contextOpen = groupItem.expanded && hasVisibleChildren;
+  const controlsMuted = muted || contextOpen;
+  if (contextOpen) container.classList.add("is-context-open");
 
   const checkWrap = document.createElement("label");
   checkWrap.className = "event-row-check";
@@ -2919,6 +3548,7 @@ function createGroupBrowserItem(groupItem) {
   const checkboxState = getGroupCheckboxState(groupItem.id);
   enabledCheckbox.checked = checkboxState.checked;
   enabledCheckbox.indeterminate = checkboxState.indeterminate;
+  enabledCheckbox.disabled = controlsMuted;
   enabledCheckbox.addEventListener("change", () => {
     setGroupEnabled(groupItem.id, enabledCheckbox.checked);
     renderEventList();
@@ -2929,6 +3559,7 @@ function createGroupBrowserItem(groupItem) {
   const toggleButton = document.createElement("button");
   toggleButton.type = "button";
   toggleButton.className = "group-row-toggle";
+  toggleButton.disabled = muted;
   toggleButton.textContent = groupItem.expanded ? "▾" : "▸";
   toggleButton.addEventListener("click", () => {
     groupItem.expanded = !groupItem.expanded;
@@ -2937,25 +3568,26 @@ function createGroupBrowserItem(groupItem) {
 
   const main = document.createElement("div");
   main.className = "group-row-main";
+  main.classList.toggle("is-disabled", controlsMuted);
 
   const title = document.createElement("strong");
   title.textContent = groupItem.title;
   const meta = document.createElement("span");
-  const directChildGroups = getChildGroups(groupItem.id).length;
   const deepEventCount = getGroupEventsDeep(groupItem.id).length;
-  meta.textContent = deepEventCount === 0 && directChildGroups === 0
-    ? "Ordner ist leer"
-    : `${deepEventCount} Ereignisse, ${directChildGroups} Unterordner`;
+  meta.textContent = deepEventCount === 0 && directChildGroups.length === 0
+    ? t("event_count_summary_zero")
+    : tf("event_count_summary", { events: deepEventCount, folders: directChildGroups.length });
   main.append(title, meta);
 
   const source = document.createElement("span");
   source.className = "group-row-source";
-  source.textContent = groupItem.sourceId ? `Wikidata ${groupItem.sourceId}` : "lokale Gruppe";
+  source.textContent = groupItem.sourceId ? `Wikidata ${groupItem.sourceId}` : t("local_group");
 
   const addSubgroupButton = document.createElement("button");
   addSubgroupButton.type = "button";
   addSubgroupButton.className = "group-row-export group-row-subgroup";
-  addSubgroupButton.textContent = "+ Unterordner";
+  addSubgroupButton.disabled = controlsMuted;
+  addSubgroupButton.textContent = t("add_subfolder");
   addSubgroupButton.addEventListener("click", () => {
     const newGroup = createEmptyGroup(groupItem.id);
     eventGroups.push(newGroup);
@@ -2963,7 +3595,7 @@ function createGroupBrowserItem(groupItem) {
     state.openEditorId = null;
     state.openGroupEditorId = newGroup.id;
     renderEventList();
-    focusEditorNameField("group");
+    focusEditorNameField("group", { reveal: true, behavior: "auto" });
   });
 
   const propertiesButton = document.createElement("button");
@@ -2972,8 +3604,9 @@ function createGroupBrowserItem(groupItem) {
   if (state.openGroupEditorId === groupItem.id) {
     propertiesButton.classList.add("is-active");
   }
+  propertiesButton.disabled = controlsMuted;
   propertiesButton.textContent = "⚙";
-  propertiesButton.setAttribute("aria-label", "Ordnereigenschaften");
+  propertiesButton.setAttribute("aria-label", t("folder_properties"));
   propertiesButton.addEventListener("click", () => {
     state.openEditorId = null;
     state.openGroupEditorId = state.openGroupEditorId === groupItem.id ? null : groupItem.id;
@@ -2983,7 +3616,8 @@ function createGroupBrowserItem(groupItem) {
   const exportButton = document.createElement("button");
   exportButton.type = "button";
   exportButton.className = "group-row-export";
-  exportButton.textContent = "Export";
+  exportButton.disabled = controlsMuted;
+  exportButton.textContent = t("export_label");
   exportButton.addEventListener("click", () => {
     downloadFolderExport(groupItem.id);
   });
@@ -2991,6 +3625,7 @@ function createGroupBrowserItem(groupItem) {
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
   deleteButton.className = "event-row-delete";
+  deleteButton.disabled = controlsMuted;
   deleteButton.textContent = "X";
   deleteButton.addEventListener("click", () => {
     const descendantIds = new Set(getDescendantGroupIds(groupItem.id));
@@ -3025,20 +3660,32 @@ function createGroupBrowserItem(groupItem) {
 
   if (groupItem.expanded) {
     const children = buildEventHierarchy(groupItem.id);
-    const childGroups = getChildGroups(groupItem.id);
+    const childGroups = directChildGroups;
+    const activeChildGroupId = childGroups.find((childGroupItem) => hasOpenGroupBranch(childGroupItem.id))?.id ?? null;
+    const activeChildEventId = directEventEntries.find((eventItem) => hasOpenEventBranch(eventItem.id))?.id ?? null;
     const childList = document.createElement("div");
     childList.className = "group-children";
     if (childGroups.length === 0 && children.length === 0) {
       const empty = document.createElement("div");
       empty.className = "group-empty";
-      empty.textContent = "Noch keine Ereignisse in dieser Epoche.";
+      empty.textContent = t("no_events_in_epoch");
       childList.appendChild(empty);
     } else {
       childGroups.forEach((childGroupItem) => {
-        childList.appendChild(createGroupBrowserItem(childGroupItem));
+        const childMuted = activeChildGroupId != null || activeChildEventId != null
+          ? activeChildGroupId !== childGroupItem.id
+          : false;
+        childList.appendChild(createGroupBrowserItem(childGroupItem, { muted: childMuted }));
       });
-      children.forEach(({ eventItem, depth }) => {
-        childList.appendChild(createEventBrowserItem(eventItem, { child: true, depth: depth + 1 }));
+      children.forEach(({ eventItem, depth, muted: childMuted }) => {
+        const directListMuted = eventItem.parentEventId == null && (activeChildGroupId != null || activeChildEventId != null)
+          ? activeChildEventId !== eventItem.id
+          : false;
+        childList.appendChild(createEventBrowserItem(eventItem, {
+          child: true,
+          depth: depth + 1,
+          muted: childMuted || directListMuted,
+        }));
       });
     }
     container.appendChild(childList);
@@ -3052,13 +3699,13 @@ function renderEventList() {
   ui.eventList.replaceChildren();
   const browserGroups = getBrowserGroups();
   const ungroupedEvents = getUngroupedEvents();
-  ui.eventBrowserInfo.textContent = `${timelineEvents.length} Ereignisse, ${browserGroups.length} Ordner`;
+  ui.eventBrowserInfo.textContent = tf("browser_info", { events: timelineEvents.length, folders: browserGroups.length });
 
   if (timelineEvents.length === 0 && browserGroups.length === 0) {
     ui.editorEmptyState.hidden = false;
     const emptyState = document.createElement("p");
     emptyState.className = "event-description";
-    emptyState.textContent = "Noch keine Ereignisse oder Epochen vorhanden.";
+    emptyState.textContent = t("browser_empty");
     ui.eventList.appendChild(emptyState);
     return;
   }
@@ -3171,20 +3818,21 @@ function createSearchResultItem(result) {
     if (!checkbox.checked) return;
     state.pendingAdds.add(result.id);
     checkbox.disabled = true;
-    ui.searchStatus.textContent = `Lade ${result.label} aus Wikidata ...`;
+    ui.searchStatus.textContent = tf("loading_result", { title: result.label });
     const eventItem = await addWikidataResult(result);
     state.pendingAdds.delete(result.id);
       if (eventItem) {
-        ui.searchStatus.textContent = `${eventItem.title} wurde hinzugefuegt und kann jetzt links bearbeitet werden.`;
+        ui.searchStatus.textContent = tf("result_added", { title: eventItem.title });
         state.openGroupEditorId = null;
         state.openEditorId = eventItem.id;
         selectEvent(eventItem.id, true);
         renderEventList();
-        scrollToDetails();
+        scrollToDetails("auto");
+        focusEditorNameField("event", { reveal: true, behavior: "auto" });
       } else {
       checkbox.checked = false;
       checkbox.disabled = false;
-      ui.searchStatus.textContent = `Zu ${result.label} konnten keine brauchbaren Zeitdaten geladen werden.`;
+      ui.searchStatus.textContent = tf("result_no_years", { title: result.label });
     }
     renderSearchResults();
   });
@@ -3193,9 +3841,9 @@ function createSearchResultItem(result) {
   const title = document.createElement("strong");
   title.textContent = `${result.label} (${result.id})`;
   const description = document.createElement("span");
-  description.textContent = result.description || "Keine Beschreibung vorhanden.";
+  description.textContent = result.description || t("no_description");
   const meta = document.createElement("small");
-  meta.textContent = checkbox.checked ? "Bereits hinzugefuegt" : "Haken setzen zum Hinzufuegen";
+  meta.textContent = checkbox.checked ? t("search_added") : t("search_add_hint");
   content.append(title, description, meta);
 
   wrapper.append(checkbox, content);
@@ -3209,10 +3857,10 @@ async function handleImportFolderFile(event) {
   try {
     const fileContent = await file.text();
     const payload = JSON.parse(fileContent);
-    importFolderPayload(payload);
+    await importFolderPayload(payload);
     scrollToDetails();
   } catch {
-    ui.eventBrowserInfo.textContent = "Import fehlgeschlagen. Bitte eine gueltige TimeMap-JSON waehlen.";
+    ui.eventBrowserInfo.textContent = t("import_failed");
   } finally {
     event.target.value = "";
   }
@@ -3223,7 +3871,7 @@ function renderSearchResults() {
   if (state.searchResults.length === 0) {
     const hint = document.createElement("p");
     hint.className = "event-description";
-    hint.textContent = "Noch keine Treffer. Starte oben eine Suche in Wikidata.";
+    hint.textContent = t("search_empty");
     ui.searchResults.appendChild(hint);
     return;
   }
@@ -3246,15 +3894,15 @@ async function searchWikidata(query) {
     action: "wbsearchentities",
     format: "json",
     origin: "*",
-    language: "de",
-    uselang: "de",
+    language: getWikidataLanguageCode(),
+    uselang: getWikidataLanguageCode(),
     type: "item",
     limit: "10",
     search: query,
   }).toString();
 
   const response = await fetch(url);
-  if (!response.ok) throw new Error("Wikidata-Suche fehlgeschlagen");
+  if (!response.ok) throw new Error("wikidata-search-failed");
   return normalizeSearchResults(await response.json());
 }
 
@@ -3345,7 +3993,7 @@ async function fetchWikidataEntity(entityId) {
     format: "json",
     origin: "*",
     ids: entityId,
-    languages: "de|en",
+    languages: getWikidataLanguageFallbacks(),
     languagefallback: "1",
     props: "labels|descriptions|claims",
   }).toString();
@@ -3370,7 +4018,7 @@ async function fetchWikidataEntities(entityIds) {
       format: "json",
       origin: "*",
       ids: chunk.join("|"),
-      languages: "de|en",
+      languages: getWikidataLanguageFallbacks(),
       languagefallback: "1",
       props: "labels|descriptions|claims",
     }).toString();
@@ -3386,8 +4034,10 @@ async function fetchWikidataEntities(entityIds) {
 
 function buildEventFromWikidata(entityId, entity, searchFallback) {
   const years = getWikidataYears(entity);
-  const label = entity.labels?.de?.value || entity.labels?.en?.value || searchFallback.label || entityId;
-  const description = entity.descriptions?.de?.value || entity.descriptions?.en?.value || searchFallback.description || "";
+  const preferredLanguage = getWikidataLanguageCode();
+  const fallbackLanguage = preferredLanguage === "de" ? "en" : "de";
+  const label = entity.labels?.[preferredLanguage]?.value || entity.labels?.[fallbackLanguage]?.value || searchFallback.label || entityId;
+  const description = entity.descriptions?.[preferredLanguage]?.value || entity.descriptions?.[fallbackLanguage]?.value || searchFallback.description || "";
   return {
     id: `wikidata-${entityId}`,
     source: "wikidata",
@@ -3420,8 +4070,10 @@ function buildEventFromWikidata(entityId, entity, searchFallback) {
 function applyWikidataEntityToEvent(eventItem, entity, fallback = {}) {
   if (!eventItem || !entity) return;
   const years = getWikidataYears(entity);
-  const label = entity.labels?.de?.value || entity.labels?.en?.value || fallback.label || eventItem.title || eventItem.sourceId;
-  const description = entity.descriptions?.de?.value || entity.descriptions?.en?.value || fallback.description || eventItem.description || "";
+  const preferredLanguage = getWikidataLanguageCode();
+  const fallbackLanguage = preferredLanguage === "de" ? "en" : "de";
+  const label = entity.labels?.[preferredLanguage]?.value || entity.labels?.[fallbackLanguage]?.value || fallback.label || eventItem.title || eventItem.sourceId;
+  const description = entity.descriptions?.[preferredLanguage]?.value || entity.descriptions?.[fallbackLanguage]?.value || fallback.description || eventItem.description || "";
 
   eventItem.title = label;
   eventItem.description = description;
@@ -3452,6 +4104,67 @@ function applyWikidataEntityToEvent(eventItem, entity, fallback = {}) {
       || eventItem.category === "Epoche";
   }
   normalizeEventDisplaySettings(eventItem);
+}
+
+function applyWikidataLocalizationToEvent(eventItem, entity, fallback = {}) {
+  if (!eventItem || !entity) return;
+  const preferredLanguage = getWikidataLanguageCode();
+  const fallbackLanguage = preferredLanguage === "de" ? "en" : "de";
+  const label = entity.labels?.[preferredLanguage]?.value || entity.labels?.[fallbackLanguage]?.value || fallback.label;
+  const description = entity.descriptions?.[preferredLanguage]?.value || entity.descriptions?.[fallbackLanguage]?.value || fallback.description;
+
+  if (label) {
+    eventItem.title = label;
+  }
+  if (description) {
+    eventItem.description = description;
+  }
+
+  const flagImageUrl = getFlagImageUrl(entity);
+  if (flagImageUrl) {
+    eventItem.flagImageUrl = flagImageUrl;
+  }
+}
+
+function applyWikidataEntityToGroup(groupItem, entity) {
+  if (!groupItem || !entity) return;
+  const preferredLanguage = getWikidataLanguageCode();
+  const fallbackLanguage = preferredLanguage === "de" ? "en" : "de";
+  const label = entity.labels?.[preferredLanguage]?.value || entity.labels?.[fallbackLanguage]?.value;
+  const description = entity.descriptions?.[preferredLanguage]?.value || entity.descriptions?.[fallbackLanguage]?.value;
+  if (label) {
+    groupItem.title = label;
+  }
+  if (description) {
+    groupItem.description = description;
+  }
+}
+
+async function refreshLocalizedWikidataContent() {
+  const wikidataEvents = timelineEvents.filter((eventItem) => eventItem?.sourceId && eventItem.source === "wikidata");
+  const wikidataGroups = eventGroups.filter((groupItem) => groupItem?.sourceId && groupItem.source === "wikidata-preset");
+  const allIds = [
+    ...wikidataEvents.map((eventItem) => eventItem.sourceId),
+    ...wikidataGroups.map((groupItem) => groupItem.sourceId),
+  ];
+
+  if (allIds.length === 0) return;
+
+  try {
+    const entities = await fetchWikidataEntities(allIds);
+    wikidataEvents.forEach((eventItem) => {
+      const entity = entities[eventItem.sourceId];
+      if (!entity) return;
+      applyWikidataLocalizationToEvent(eventItem, entity);
+    });
+    wikidataGroups.forEach((groupItem) => {
+      const entity = entities[groupItem.sourceId];
+      if (!entity) return;
+      applyWikidataEntityToGroup(groupItem, entity);
+    });
+  } catch {
+    // Keep current visible texts if a language refresh from Wikidata fails.
+  }
 }
 
 async function hydrateEventsFromWikidata(eventItems) {
@@ -3526,19 +4239,19 @@ async function handleSearchSubmit(event) {
   event.preventDefault();
   const query = ui.searchInput.value.trim();
   if (!query) {
-    ui.searchStatus.textContent = "Bitte gib zuerst einen Suchbegriff ein.";
+    ui.searchStatus.textContent = t("search_enter_query");
     return;
   }
 
-  ui.searchStatus.textContent = `Suche nach "${query}" in Wikidata ...`;
+  ui.searchStatus.textContent = tf("search_loading", { query });
   try {
     state.searchResults = await searchWikidata(query);
     ui.searchStatus.textContent = state.searchResults.length > 0
-      ? `${state.searchResults.length} Treffer gefunden.`
-      : "Keine Treffer gefunden.";
+      ? tf("search_results_found", { count: state.searchResults.length })
+      : t("search_no_results");
   } catch {
     state.searchResults = [];
-    ui.searchStatus.textContent = "Die Wikidata-Suche konnte nicht geladen werden. Bitte spaeter erneut versuchen.";
+    ui.searchStatus.textContent = t("search_failed");
   }
   renderSearchResults();
 }
@@ -3554,6 +4267,16 @@ function bindEvents() {
   window.addEventListener("resize", requestRedraw);
   ui.appFrame.addEventListener("scroll", handleScrollAnchor, { passive: true });
   ui.searchForm.addEventListener("submit", handleSearchSubmit);
+  ui.languageSelect.addEventListener("change", async () => {
+    await applyLanguage(ui.languageSelect.value);
+  });
+  ui.timelineMenuButton.addEventListener("click", toggleTimelineMenu);
+  ui.timelineMenuCloseButton.addEventListener("click", () => {
+    setTimelineMenuOpen(false);
+  });
+  ui.timelineMenuOverlay.addEventListener("click", () => {
+    setTimelineMenuOpen(false);
+  });
   ui.openWorkspaceStrip.addEventListener("click", (event) => {
     handleWorkspaceStripOpen(event, "auto");
   });
@@ -3573,6 +4296,11 @@ function bindEvents() {
       handleWorkspaceStripOpen(event);
     }
   });
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.timelineMenuOpen) {
+      setTimelineMenuOpen(false);
+    }
+  });
   ui.openWorkspaceStrip.addEventListener("wheel", (event) => {
     handleWorkspaceStripOpen(event);
   }, { passive: false });
@@ -3587,8 +4315,8 @@ function bindEvents() {
     state.openEditorId = newEvent.id;
     selectEvent(newEvent.id, true);
     renderEventList();
-    focusEditorNameField("event");
-    scrollToDetails();
+    scrollToDetails("auto");
+    focusEditorNameField("event", { reveal: true, behavior: "auto" });
   });
   ui.addFolderButton.addEventListener("click", () => {
     const newGroup = createEmptyGroup();
@@ -3596,8 +4324,8 @@ function bindEvents() {
     state.openEditorId = null;
     state.openGroupEditorId = newGroup.id;
     renderEventList();
-    focusEditorNameField("group");
-    scrollToDetails();
+    scrollToDetails("auto");
+    focusEditorNameField("group", { reveal: true, behavior: "auto" });
   });
   ui.addEpochGroupButton.addEventListener("click", () => {
     state.showEpochMenu = !state.showEpochMenu;
@@ -3623,14 +4351,17 @@ function bindEvents() {
   ui.resetViewButton.addEventListener("click", resetView);
   ui.zoomInButton.addEventListener("click", () => zoom(-1));
   ui.zoomOutButton.addEventListener("click", () => zoom(1));
-  ui.focusNowButton.addEventListener("click", () => {
-    hideTooltip();
-    state.centerYear = getNowTimelineValue();
-    state.showTodayMarker = !state.showTodayMarker;
-    clearSelectedEvent();
-  });
+  ui.focusNowButton.addEventListener("click", toggleTodayFocus);
 
   window.addEventListener("keydown", (event) => {
+    if ((event.key === " " || event.code === "Space") && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      if (isTextEditingElement(document.activeElement) || !isTimelineWindowActive()) {
+        return;
+      }
+      event.preventDefault();
+      toggleTodayFocus();
+      return;
+    }
     hideTooltip();
     if (event.shiftKey && event.key === "ArrowUp") {
       event.preventDefault();
@@ -3650,7 +4381,10 @@ function bindEvents() {
 }
 
 function init() {
+  loadLanguagePreference();
+  populateLanguageSelect();
   bindEvents();
+  applyStaticTranslations();
   updateSelectionPanel();
   renderEpochMenu();
   renderEventList();
