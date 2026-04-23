@@ -28,6 +28,11 @@ const ui = {
   searchForm: document.getElementById("searchForm"),
   searchInput: document.getElementById("searchInput"),
   searchStatus: document.getElementById("searchStatus"),
+  searchLoadingPanel: document.getElementById("searchLoadingPanel"),
+  searchLoadingLabel: document.getElementById("searchLoadingLabel"),
+  searchLoadingPercent: document.getElementById("searchLoadingPercent"),
+  searchLoadingFill: document.getElementById("searchLoadingFill"),
+  searchLoadingText: document.getElementById("searchLoadingText"),
   searchResults: document.getElementById("searchResults"),
   timelineMenuButton: document.getElementById("timelineMenuButton"),
   timelineMenuOverlay: document.getElementById("timelineMenuOverlay"),
@@ -97,19 +102,19 @@ const LANGUAGE_OPTIONS = [
 ];
 const I18N = {
   de: {
-    timeline_menu_open: "Menue oeffnen",
-    timeline_menu_close: "Menue schliessen",
-    timeline_menu: "Menue",
-    timeline_menu_title: "Zeitstrahl-Menue",
+    timeline_menu_open: "Menü öffnen",
+    timeline_menu_close: "Menü schließen",
+    timeline_menu: "Menü",
+    timeline_menu_title: "Zeitstrahl-Menü",
     menu_language_title: "1. Sprachauswahl",
     menu_language_label: "Sprache",
     menu_language_description: "Deutsch und Englisch sind bereits funktional. Weitere EU-Sprachen plus Ukrainisch sind vorbereitet.",
     menu_help_title: "2. Hilfe zur Funktionsweise der App",
-    menu_help_description: "Platz fuer eine kurze Einfuehrung, Bedienhinweise und erklaerende Beispiele.",
+    menu_help_description: "Platz für eine kurze Einführung, Bedienhinweise und erklärende Beispiele.",
     menu_apps_title: "3. Wechsel zu anderen Applikationen",
-    menu_apps_description: "Vorbereitung fuer weitere Werkzeuge wie GenMap zur Anzeige genealogischer GEDCOM-Dateien.",
+    menu_apps_description: "Vorbereitung für weitere Werkzeuge wie GenMap zur Anzeige genealogischer GEDCOM-Dateien.",
     menu_visual_tools_title: "4. Weitere Data-Visualisation Tools",
-    menu_visual_tools_description: "Bereich fuer kuenftige Module und alternative Visualisierungsansichten.",
+    menu_visual_tools_description: "Bereich für künftige Module und alternative Visualisierungsansichten.",
     reset_view: "Startansicht",
     zoom_in: "Zoomen +",
     zoom_out: "Zoomen -",
@@ -119,20 +124,28 @@ const I18N = {
     fullscreen_toggle: "Vollbild umschalten",
     editor_panel_label: "Bearbeitung",
     editor_panel_title: "Ereignisbibliothek",
-    editor_empty: "Fuege ueber die Suche rechts ein Wikidata-Ereignis hinzu oder waehle einen vorhandenen Eintrag aus dem Zeitstrahl.",
+    editor_empty: "Füge über die Suche rechts ein Wikidata-Ereignis hinzu oder wähle einen vorhandenen Eintrag aus dem Zeitstrahl.",
     event_library_label: "Ereignisbrowser",
     add_event: "Ereignis",
     add_folder: "Ordner",
-    add_more: "Hinzufuegen",
+    add_more: "Hinzufügen",
     import: "Importieren",
     search_panel_label: "Wikidata-Suche",
-    search_panel_title: "Eintraege finden und hinzufuegen",
+    search_panel_title: "Einträge finden und hinzufügen",
     search_placeholder: "Wikidata durchsuchen",
     search_button: "Suchen",
     search_default: "Suche nach historischen Ereignissen, Personen, Epochen oder Bauwerken.",
+    loading_label: "Ladevorgang",
+    loading_prepare: "Bereite Ladevorgang vor ...",
+    loading_processing_result: "Verarbeite {title} und übernehme die Daten in den Zeitstrahl ...",
+    loading_update_view: "Aktualisiere Ansicht und Editor ...",
+    loading_read_file: "Lese Datei {title} ...",
+    loading_parse_file: "Prüfe und verarbeite die Importdatei ...",
+    loading_import_folder: "Importiere Ordner {title} ...",
+    loading_localize_content: "Aktualisiere Sprachdaten und Anzeigen ...",
     no_description: "Keine Beschreibung vorhanden.",
-    no_event_selected: "Kein Ereignis ausgewaehlt",
-    click_marker_hint: "Klicke auf einen Marker auf dem Zeitstrahl oder fuege rechts ein Wikidata-Element hinzu.",
+    no_event_selected: "Kein Ereignis ausgewählt",
+    click_marker_hint: "Klicke auf einen Marker auf dem Zeitstrahl oder füge rechts ein Wikidata-Element hinzu.",
     no_folder_assigned: "keinem Ordner zugeordnet",
     from: "Von",
     year: "Jahr",
@@ -167,10 +180,10 @@ const I18N = {
     soon_suffix: "bald",
     no_year_data: "Jahresdaten fehlen",
     axis_point: "Achsenpunkt",
-    color_pick_aria: "auswaehlen",
-    no_limit: "keine Einschraenkung",
+    color_pick_aria: "auswählen",
+    no_limit: "keine Einschränkung",
     automatic: "Automatisch",
-    bar_upper_zero: "+0 fuer Balken",
+    bar_upper_zero: "+0 für Balken",
     bar_lower_zero: "-0 unterhalb",
     above_suffix: "oberhalb",
     below_suffix: "unterhalb",
@@ -178,12 +191,12 @@ const I18N = {
     no_default: "keine Vorgabe",
     color_value: "Farbwert",
     folder_color_value: "Standard-Farbwert",
-    display_height: "Darstellungshoehe",
-    folder_display_height: "Standard-Darstellungshoehe",
-    contains_earth_history: "enthaelt Aeon, Aera, Periode und Epoche aus der lokalen Referenz",
+    display_height: "Darstellungshöhe",
+    folder_display_height: "Standard-Darstellungshöhe",
+    contains_earth_history: "enthält Äon, Ära, Periode und Epoche aus der lokalen Referenz",
     already_created: "bereits angelegt",
-    loading_ranges_for: "Lade Zeitraeume fuer {title} aus Wikidata ...",
-    loading_ranges_failed: "Zeitraeume fuer {title} konnten nicht automatisch geladen werden.",
+    loading_ranges_for: "Lade Zeiträume für {title} aus Wikidata ...",
+    loading_ranges_failed: "Zeiträume für {title} konnten nicht automatisch geladen werden.",
     show_child_events: "Untergeordnete Ereignisse anzeigen",
     warning_missing_year_data: "Warnung: Jahresdaten fehlen",
     event_count_summary_zero: "Ordner ist leer",
@@ -195,17 +208,17 @@ const I18N = {
     no_events_in_epoch: "Noch keine Ereignisse in dieser Epoche.",
     browser_info: "{events} Ereignisse, {folders} Ordner",
     browser_empty: "Noch keine Ereignisse oder Epochen vorhanden.",
-    search_add_hint: "Haken setzen zum Hinzufuegen",
-    search_added: "Bereits hinzugefuegt",
-    import_failed: "Import fehlgeschlagen. Bitte eine gueltige TimeMap-JSON waehlen.",
+    search_add_hint: "Haken setzen zum Hinzufügen",
+    search_added: "Bereits hinzugefügt",
+    import_failed: "Import fehlgeschlagen. Bitte eine gültige TimeMap-JSON wählen.",
     search_empty: "Noch keine Treffer. Starte oben eine Suche in Wikidata.",
     search_enter_query: "Bitte gib zuerst einen Suchbegriff ein.",
     search_loading: "Suche nach \"{query}\" in Wikidata ...",
     search_results_found: "{count} Treffer gefunden.",
     search_no_results: "Keine Treffer gefunden.",
-    search_failed: "Die Wikidata-Suche konnte nicht geladen werden. Bitte spaeter erneut versuchen.",
+    search_failed: "Die Wikidata-Suche konnte nicht geladen werden. Bitte später erneut versuchen.",
     loading_result: "Lade {title} aus Wikidata ...",
-    result_added: "{title} wurde hinzugefuegt und kann jetzt links bearbeitet werden.",
+    result_added: "{title} wurde hinzugefügt und kann jetzt links bearbeitet werden.",
     result_no_years: "Zu {title} konnten keine brauchbaren Zeitdaten geladen werden.",
     folder_exported: "Ordner {title} wurde als JSON exportiert.",
     folder_imported: "Ordner {title} wurde importiert.",
@@ -249,6 +262,14 @@ const I18N = {
     search_placeholder: "Search Wikidata",
     search_button: "Search",
     search_default: "Search for historical events, people, epochs, or buildings.",
+    loading_label: "Loading",
+    loading_prepare: "Preparing import ...",
+    loading_processing_result: "Processing {title} and applying the data to the timeline ...",
+    loading_update_view: "Updating view and editor ...",
+    loading_read_file: "Reading file {title} ...",
+    loading_parse_file: "Checking and processing import file ...",
+    loading_import_folder: "Importing folder {title} ...",
+    loading_localize_content: "Updating language data and views ...",
     no_description: "No description available.",
     no_event_selected: "No event selected",
     click_marker_hint: "Click a marker on the timeline or add a Wikidata item on the right.",
@@ -341,8 +362,8 @@ const EARTH_HISTORY_PRESET = {
   sourceId: "Q43521",
   description: "Hierarchische Erdzeitalter-Struktur auf Basis einer lokalen Wikidata-Referenz.",
   typeLabels: {
-    eon: "Aeon",
-    era: "Aera",
+    eon: "Äon",
+    era: "Ära",
     period: "Periode",
     epoch: "Epoche",
   },
@@ -491,6 +512,8 @@ const state = {
   resizeFrame: 0,
   searchResults: [],
   pendingAdds: new Set(),
+  loadingHideTimer: null,
+  folderImportLoading: null,
   tooltipEventId: null,
   clickTimer: null,
   lastClickEventId: null,
@@ -501,9 +524,11 @@ const state = {
   subYearTickAnchorValue: null,
   dragState: null,
   browserDragEventId: null,
+  browserDragGroupId: null,
   suppressClickUntil: 0,
   timelineMenuOpen: false,
   language: "de",
+  activeContextGroupId: null,
 };
 
 if (ui.addCustomEventButton) {
@@ -519,6 +544,7 @@ if (ui.addFolderButton) {
 if (ui.addEpochGroupButton) {
   ui.addEpochGroupButton.classList.add("add-action-button");
   ui.addEpochGroupButton.innerHTML = '<span class="add-action-plus">+</span><span>Hinzufügen</span>';
+  ui.addEpochGroupButton.disabled = true;
 }
 
 function clamp(value, min, max) {
@@ -617,12 +643,91 @@ function applyStaticTranslations() {
   if (ui.addCustomEventButton) ui.addCustomEventButton.innerHTML = `<span class="add-action-plus">+</span><span>${t("add_event")}</span>`;
   if (ui.addFolderButton) ui.addFolderButton.innerHTML = `<span class="add-action-plus">+</span><span>${t("add_folder")}</span>`;
   if (ui.addEpochGroupButton) ui.addEpochGroupButton.innerHTML = `<span class="add-action-plus">+</span><span>${t("add_more")}</span>`;
+  if (ui.addEpochGroupButton) ui.addEpochGroupButton.disabled = true;
   if (ui.importFolderButton) ui.importFolderButton.textContent = t("import");
   if (ui.searchPanelLabel) ui.searchPanelLabel.textContent = t("search_panel_label");
   if (ui.searchPanelTitle) ui.searchPanelTitle.textContent = t("search_panel_title");
   if (ui.searchInput) ui.searchInput.placeholder = t("search_placeholder");
   if (ui.searchSubmitButton) ui.searchSubmitButton.textContent = t("search_button");
+  if (ui.searchLoadingLabel) ui.searchLoadingLabel.textContent = t("loading_label");
+  if (ui.searchLoadingText && ui.searchLoadingPanel?.hidden) ui.searchLoadingText.textContent = t("loading_prepare");
   if (ui.searchStatus && !state.searchResults.length) ui.searchStatus.textContent = t("search_default");
+}
+
+function clearLoadingHideTimer() {
+  if (state.loadingHideTimer != null) {
+    window.clearTimeout(state.loadingHideTimer);
+    state.loadingHideTimer = null;
+  }
+}
+
+function waitForNextPaint() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.setTimeout(resolve, 0);
+    });
+  });
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+function setSearchLoadingState({ visible, text = "", progress = 0 }) {
+  if (!ui.searchLoadingPanel || !ui.searchLoadingFill || !ui.searchLoadingPercent || !ui.searchLoadingText) return;
+  clearLoadingHideTimer();
+  const clampedProgress = clamp(Number(progress) || 0, 0, 100);
+  ui.searchLoadingPanel.hidden = !visible;
+  ui.searchLoadingFill.style.width = `${clampedProgress}%`;
+  ui.searchLoadingPercent.textContent = `${Math.round(clampedProgress)}%`;
+  ui.searchLoadingText.textContent = text || t("loading_prepare");
+}
+
+function hideSearchLoading(delay = 0) {
+  if (!ui.searchLoadingPanel) return;
+  clearLoadingHideTimer();
+  const hide = () => {
+    ui.searchLoadingPanel.hidden = true;
+  };
+  if (delay > 0) {
+    state.loadingHideTimer = window.setTimeout(hide, delay);
+    return;
+  }
+  hide();
+}
+
+function setFolderImportLoading({ visible, title = "", text = "", progress = 0, groupId = null }) {
+  state.folderImportLoading = visible
+    ? {
+      title: title || t("import"),
+      text: text || t("loading_prepare"),
+      progress: clamp(Number(progress) || 0, 0, 100),
+      groupId,
+    }
+    : null;
+  if (visible && !groupId && ui.eventBrowserInfo) {
+    ui.eventBrowserInfo.textContent = text || title || t("loading_prepare");
+  }
+  renderEventList();
+}
+
+function createInlineLoadingBody(loadingState) {
+  const body = document.createElement("div");
+  body.className = "import-loading-body";
+
+  const bar = document.createElement("div");
+  bar.className = "search-loading-bar";
+  bar.setAttribute("aria-hidden", "true");
+
+  const fill = document.createElement("span");
+  fill.className = "search-loading-fill";
+  fill.style.width = `${loadingState.progress}%`;
+
+  bar.appendChild(fill);
+  body.appendChild(bar);
+  return body;
 }
 
 async function applyLanguage(languageCode) {
@@ -718,6 +823,49 @@ function estimateLabelWidth(eventItem) {
   return baseWidth;
 }
 
+function rectanglesOverlap(left, right, padding = 0) {
+  return !(
+    (left.x + left.width + padding) <= right.x
+    || (right.x + right.width + padding) <= left.x
+    || (left.y + left.height + padding) <= right.y
+    || (right.y + right.height + padding) <= left.y
+  );
+}
+
+function normalizeRect(rect) {
+  return {
+    x: rect.x,
+    y: rect.y,
+    width: rect.width,
+    height: rect.height,
+  };
+}
+
+function insetRect(rect, insetX = 0, insetY = insetX) {
+  return {
+    x: rect.x + insetX,
+    y: rect.y + insetY,
+    width: Math.max(0, rect.width - insetX * 2),
+    height: Math.max(0, rect.height - insetY * 2),
+  };
+}
+
+function getSvgSpaceRect(element) {
+  if (!element || !svg) return null;
+  try {
+    const svgRect = svg.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    return {
+      x: elementRect.left - svgRect.left,
+      y: elementRect.top - svgRect.top,
+      width: elementRect.width,
+      height: elementRect.height,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function drawSvgLabelWithPrefix(eventItem, centerX, baselineY, options = {}) {
   const {
     fill = "#a4b0b8",
@@ -726,7 +874,9 @@ function drawSvgLabelWithPrefix(eventItem, centerX, baselineY, options = {}) {
     align = "above",
   } = options;
 
-  const group = createSvgElement("g");
+  const group = createSvgElement("g", {
+    "pointer-events": "visiblePainted",
+  });
   let currentX = 0;
 
   if (isWarCategory(eventItem.category)) {
@@ -777,6 +927,10 @@ function drawSvgLabelWithPrefix(eventItem, centerX, baselineY, options = {}) {
     const fallbackWidth = estimateLabelWidth(eventItem);
     group.setAttribute("transform", `translate(${centerX - fallbackWidth / 2} 0)`);
   }
+
+  const bounds = getSvgSpaceRect(group);
+
+  return { group, bounds };
 }
 
 function getStep() {
@@ -1091,6 +1245,16 @@ function expandGroupAncestors(groupId) {
   }
 }
 
+function expandEventAncestors(eventId) {
+  let currentEvent = getEventById(eventId);
+  while (currentEvent?.parentEventId) {
+    const parentEvent = getEventById(currentEvent.parentEventId);
+    if (!parentEvent) break;
+    parentEvent.expanded = true;
+    currentEvent = parentEvent;
+  }
+}
+
 function getGroupDepth(groupId) {
   let depth = 0;
   let currentGroup = getGroupById(groupId);
@@ -1119,6 +1283,14 @@ function canDropEventOnGroup(eventId, targetGroupId) {
   if (!targetGroup.parentGroupId) return false;
   if (eventItem.groupId === targetGroupId) return false;
   return getRootGroupId(eventItem.groupId) === getRootGroupId(targetGroupId);
+}
+
+function canDropGroupOnGroup(draggedGroupId, targetGroupId) {
+  const draggedGroup = getGroupById(draggedGroupId);
+  const targetGroup = getGroupById(targetGroupId);
+  if (!draggedGroup || !targetGroup || draggedGroup.id === targetGroup.id) return false;
+  if (getDescendantGroupIds(draggedGroup.id).includes(targetGroup.id)) return false;
+  return true;
 }
 
 function getEventDescendantIds(eventId) {
@@ -1153,6 +1325,12 @@ function moveEventTreeToGroup(eventId, targetGroupId) {
   });
 }
 
+function moveGroupTreeToGroup(groupId, targetGroupId) {
+  const groupItem = getGroupById(groupId);
+  if (!groupItem) return;
+  groupItem.parentGroupId = targetGroupId;
+}
+
 function getGroupCheckboxState(groupId) {
   const groupItem = getGroupById(groupId);
   const descendantEvents = getGroupEventsDeep(groupId);
@@ -1185,6 +1363,24 @@ function getEventAnchorYear(eventItem) {
   const endValue = getTimelineValueForEventEnd(eventItem);
   if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) return startValue;
   return (startValue + endValue) / 2;
+}
+
+function getVisibleObjectLabelCenterX(startX, endX, viewportLeft, viewportRight, fallbackX) {
+  const objectLeft = Math.min(startX, endX);
+  const objectRight = Math.max(startX, endX);
+  const visibleLeft = Math.max(viewportLeft, objectLeft);
+  const visibleRight = Math.min(viewportRight, objectRight);
+
+  if (objectLeft < viewportLeft && objectRight > viewportRight) {
+    return (viewportLeft + viewportRight) / 2;
+  }
+  if (objectLeft < viewportLeft) {
+    return (viewportLeft + visibleRight) / 2;
+  }
+  if (objectRight > viewportRight) {
+    return (visibleLeft + viewportRight) / 2;
+  }
+  return fallbackX;
 }
 
 function getEventDateLabel(eventItem) {
@@ -1618,7 +1814,7 @@ function getLaneGeometry(eventItem, autoIndex, lineY) {
   const markerY = getBarMarkerYForLane(lineLane, lineY);
   return {
     markerY,
-    labelY: markerY + (lineLane < 0 ? 28 : -14),
+    labelY: markerY + (lineLane < 0 ? 14 : -7),
   };
 }
 
@@ -1689,11 +1885,15 @@ function createField(labelText, inputElement) {
 }
 
 function focusEditorNameField(kind, options = {}) {
-  const { reveal = false, behavior = "smooth" } = options;
+  const { reveal = false, behavior = "smooth", targetId = null } = options;
   window.requestAnimationFrame(() => {
     const selector = kind === "group"
-      ? '.group-inline-editor [data-editor-name-field="group"]'
-      : '.event-inline-editor [data-editor-name-field="event"]';
+      ? (targetId
+        ? `.group-inline-editor[data-group-id="${targetId}"] [data-editor-name-field="group"]`
+        : '.group-inline-editor [data-editor-name-field="group"]')
+      : (targetId
+        ? `.event-inline-editor[data-event-id="${targetId}"] [data-editor-name-field="event"]`
+        : '.event-inline-editor [data-editor-name-field="event"]');
     const input = ui.eventList?.querySelector(selector);
     if (!input) return;
     try {
@@ -2094,13 +2294,21 @@ function downloadFolderExport(groupId) {
   ui.eventBrowserInfo.textContent = tf("folder_exported", { title: groupItem.title });
 }
 
-async function importFolderPayload(payload) {
+async function importFolderPayload(payload, onProgress = null) {
   if (!payload || payload.type !== "timemap-folder-export" || !Array.isArray(payload.groups) || !Array.isArray(payload.events)) {
-    throw new Error("ungueltiges-format");
+    throw new Error("ungültiges-format");
   }
 
   const groupIdMap = new Map();
   const eventIdMap = new Map();
+  const folderTitle = payload.title ?? payload.groups.find((group) => group.parentGroupId == null)?.title ?? "TimeMap";
+
+  if (typeof onProgress === "function") {
+    onProgress({
+      text: tf("loading_import_folder", { title: folderTitle }),
+      progress: 56,
+    });
+  }
 
   const orderedGroups = [...payload.groups].sort((left, right) => {
     if (left.parentGroupId == null && right.parentGroupId != null) return -1;
@@ -2114,7 +2322,7 @@ async function importFolderPayload(payload) {
       ...sourceGroup,
       id: createUniqueId("group-import"),
       parentGroupId: sourceGroup.parentGroupId ? (groupIdMap.get(sourceGroup.parentGroupId) ?? null) : null,
-      expanded: sourceGroup.expanded !== false,
+      expanded: false,
       enabled: sourceGroup.enabled !== false,
     };
     groupIdMap.set(sourceGroup.id, groupItem.id);
@@ -2146,10 +2354,25 @@ async function importFolderPayload(payload) {
   sanitizeEventHierarchy();
   const importedRootGroupId = payload.rootGroupId ? groupIdMap.get(payload.rootGroupId) : null;
   const importedRootGroup = importedRootGroupId ? getGroupById(importedRootGroupId) : null;
+  if (typeof onProgress === "function" && importedRootGroup) {
+    onProgress({
+      title: importedRootGroup.title,
+      text: tf("loading_import_folder", { title: importedRootGroup.title }),
+      progress: 64,
+      groupId: importedRootGroup.id,
+    });
+    await waitForNextPaint();
+  }
   if (importedRootGroup) {
-    importedRootGroup.expanded = true;
     state.openEditorId = null;
-    state.openGroupEditorId = importedRootGroup.id;
+    state.openGroupEditorId = null;
+  }
+  if (typeof onProgress === "function") {
+    onProgress({
+      text: t("loading_localize_content"),
+      progress: 76,
+    });
+    await waitForNextPaint();
   }
   await refreshLocalizedWikidataContent();
   if (importedRootGroup) {
@@ -2160,9 +2383,12 @@ async function importFolderPayload(payload) {
   renderEpochMenu();
   renderEventList();
   drawTimeline();
-  if (importedRootGroup) {
-    scrollToDetails("auto");
-    focusEditorNameField("group", { reveal: true, behavior: "auto" });
+  if (typeof onProgress === "function") {
+    onProgress({
+      text: t("loading_update_view"),
+      progress: 94,
+    });
+    await waitForNextPaint();
   }
 }
 
@@ -2319,6 +2545,7 @@ function selectEvent(eventId, openEditor = false) {
   if (!match) return;
   state.selectedEventId = eventId;
   state.openGroupEditorId = null;
+  state.activeContextGroupId = match.groupId ?? null;
   if (openEditor) state.openEditorId = eventId;
   updateSelectionPanel();
   renderEventList();
@@ -2403,6 +2630,7 @@ function toggleTimelineMenu(event) {
 function handleWorkspaceStripOpen(event, behavior = "smooth") {
   if (event) {
     if (event.target?.closest?.("#fullscreenButton")) return;
+    if (event.type === "wheel" && event.deltaY <= 0) return;
     event.preventDefault();
   }
   openWorkspace(behavior);
@@ -2498,40 +2726,43 @@ function bindEventDrag(target, eventItem) {
   });
 }
 
+function openEventInLibrary(eventItem) {
+  hideTooltip();
+  if (state.clickTimer) {
+    clearTimeout(state.clickTimer);
+    state.clickTimer = null;
+  }
+  state.lastClickEventId = null;
+  state.lastClickTime = 0;
+  state.openGroupEditorId = null;
+  state.openEditorId = eventItem.id;
+  state.selectedEventId = eventItem.id;
+  state.activeContextGroupId = eventItem.groupId ?? null;
+  if (eventItem.groupId) {
+    expandGroupAncestors(eventItem.groupId);
+  }
+  expandEventAncestors(eventItem.id);
+  updateSelectionPanel();
+  renderEventList();
+  drawTimeline();
+  requestAnimationFrame(() => {
+    scrollToDetails("auto");
+    focusEditorNameField("event", { reveal: true, behavior: "auto", targetId: eventItem.id });
+  });
+}
+
 function bindEventSelection(target, eventItem) {
   bindEventDrag(target, eventItem);
   target.addEventListener("click", () => {
     if (Date.now() < state.suppressClickUntil) {
       return;
     }
-    const now = Date.now();
-    const isDoubleClick = state.lastClickEventId === eventItem.id && now - state.lastClickTime <= 450;
-    state.lastClickEventId = eventItem.id;
-    state.lastClickTime = now;
-
-    if (isDoubleClick) {
-      if (state.clickTimer) {
-        clearTimeout(state.clickTimer);
-        state.clickTimer = null;
-      }
-      state.lastClickEventId = null;
-      state.lastClickTime = 0;
-        hideTooltip();
-        state.openGroupEditorId = null;
-        state.openEditorId = eventItem.id;
-        state.selectedEventId = eventItem.id;
-        updateSelectionPanel();
-        renderEventList();
-        drawTimeline();
-        requestAnimationFrame(() => {
-          scrollToDetails("auto");
-        });
-        return;
-      }
 
     if (state.clickTimer) {
       clearTimeout(state.clickTimer);
     }
+    state.lastClickEventId = eventItem.id;
+    state.lastClickTime = Date.now();
     state.clickTimer = window.setTimeout(() => {
       state.clickTimer = null;
       state.tooltipEventId = eventItem.id;
@@ -2540,19 +2771,17 @@ function bindEventSelection(target, eventItem) {
       drawTimeline();
     }, 240);
   });
+  target.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    if (Date.now() < state.suppressClickUntil) {
+      return;
+    }
+    openEventInLibrary(eventItem);
+  });
   target.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      hideTooltip();
-      state.openGroupEditorId = null;
-      state.openEditorId = eventItem.id;
-      state.selectedEventId = eventItem.id;
-      updateSelectionPanel();
-      renderEventList();
-      drawTimeline();
-      requestAnimationFrame(() => {
-        scrollToDetails("auto");
-      });
+      openEventInLibrary(eventItem);
     }
   });
 }
@@ -2569,6 +2798,8 @@ function drawTimeline() {
   const currentValue = getNowTimelineValue();
   const eventGeometries = new Map();
   const pendingRelations = [];
+  const occupiedGraphicBounds = [];
+  const labelPlacements = [];
 
   visibleEvents.forEach((eventItem, index) => {
     const laneGeometry = getLaneGeometry(eventItem, index, lineY);
@@ -2717,6 +2948,9 @@ function drawTimeline() {
   visibleEvents.forEach((eventItem) => {
     const geometry = eventGeometries.get(eventItem.id);
     const { startX, endX, anchorX, markerY } = geometry;
+    const visibleLabelCenterX = isRangeEvent(eventItem)
+      ? getVisibleObjectLabelCenterX(startX, endX, paddingX, state.width - paddingX, anchorX)
+      : anchorX;
     const selected = eventItem.id === state.selectedEventId;
     const effectiveColor = getEffectiveColor(eventItem);
     const effectiveLane = getEffectiveLane(eventItem);
@@ -2744,10 +2978,12 @@ function drawTimeline() {
     if (isBarDisplay(eventItem) && isRangeEvent(eventItem)) {
       const boxHeight = 14;
       const boxY = markerY - boxHeight / 2;
+      const boxX = Math.min(startX, endX);
+      const boxWidth = Math.max(12, Math.abs(endX - startX));
       const rangeBox = createSvgElement("rect", {
-        x: Math.min(startX, endX),
+        x: boxX,
         y: boxY,
-        width: Math.max(12, Math.abs(endX - startX)),
+        width: boxWidth,
         height: boxHeight,
         rx: 4,
         fill: accent,
@@ -2760,12 +2996,26 @@ function drawTimeline() {
       });
       bindEventSelection(rangeBox, eventItem);
       svg.appendChild(rangeBox);
+      occupiedGraphicBounds.push({
+        eventId: eventItem.id,
+        kind: "bar",
+        rect: insetRect({ x: boxX, y: boxY, width: boxWidth, height: boxHeight }, 0.5, 1.5),
+      });
 
-      drawSvgLabelWithPrefix(eventItem, anchorX, markerY + 4, {
+      const labelResult = drawSvgLabelWithPrefix(eventItem, visibleLabelCenterX, markerY + 4, {
         fill: "#eef3f6",
         fontSize: 11.5,
         fontWeight: selected ? 600 : 500,
         align: "center",
+      });
+      if (labelResult?.group) {
+        bindEventSelection(labelResult.group, eventItem);
+      }
+      labelPlacements.push({
+        eventId: eventItem.id,
+        kind: "bar",
+        bounds: labelResult?.bounds ?? null,
+        group: labelResult?.group ?? null,
       });
 
       if (state.tooltipEventId === eventItem.id) {
@@ -2775,13 +3025,24 @@ function drawTimeline() {
     }
 
     if (isRangeEvent(eventItem)) {
+      const rangeStrokeWidth = selected ? 6 : 4;
       const rangeLine = createSvgElement("line", {
         x1: startX, y1: markerY, x2: endX, y2: markerY,
-        stroke: accent, "stroke-width": selected ? 6 : 4, "stroke-linecap": "round",
+        stroke: accent, "stroke-width": rangeStrokeWidth, "stroke-linecap": "round",
         tabindex: 0, role: "button", "aria-label": `${eventItem.title}, ${getEventDateLabel(eventItem)}`,
       });
       bindEventSelection(rangeLine, eventItem);
       svg.appendChild(rangeLine);
+      occupiedGraphicBounds.push({
+        eventId: eventItem.id,
+        kind: "line",
+        rect: {
+          x: Math.min(startX, endX),
+          y: markerY - rangeStrokeWidth / 2,
+          width: Math.max(1, Math.abs(endX - startX)),
+          height: rangeStrokeWidth,
+        },
+      });
 
       [startX, endX].forEach((x) => {
         const endpoint = createSvgElement("circle", {
@@ -2791,6 +3052,16 @@ function drawTimeline() {
         });
         bindEventSelection(endpoint, eventItem);
         svg.appendChild(endpoint);
+        occupiedGraphicBounds.push({
+          eventId: eventItem.id,
+          kind: "endpoint",
+          rect: {
+            x: x - rangeEndpointRadius,
+            y: markerY - rangeEndpointRadius,
+            width: rangeEndpointRadius * 2,
+            height: rangeEndpointRadius * 2,
+          },
+        });
       });
     } else {
       const marker = createSvgElement("circle", {
@@ -2800,13 +3071,32 @@ function drawTimeline() {
       });
       bindEventSelection(marker, eventItem);
       svg.appendChild(marker);
+      occupiedGraphicBounds.push({
+        eventId: eventItem.id,
+        kind: "point",
+        rect: {
+          x: anchorX - pointRadius,
+          y: markerY - pointRadius,
+          width: pointRadius * 2,
+          height: pointRadius * 2,
+        },
+      });
     }
 
-    drawSvgLabelWithPrefix(eventItem, anchorX, geometry.labelY, {
-      fill: selected ? "#eef3f6" : "#a4b0b8",
-      fontSize: 13,
-      fontWeight: selected ? 600 : 400,
+      const labelResult = drawSvgLabelWithPrefix(eventItem, visibleLabelCenterX, geometry.labelY, {
+        fill: selected ? "#eef3f6" : "#a4b0b8",
+        fontSize: 13,
+        fontWeight: selected ? 600 : 400,
       align: geometry.labelY < lineY ? "above" : "below",
+    });
+    if (labelResult?.group) {
+      bindEventSelection(labelResult.group, eventItem);
+    }
+    labelPlacements.push({
+      eventId: eventItem.id,
+      kind: isBarDisplay(eventItem) ? "bar" : "line",
+      bounds: labelResult?.bounds ?? null,
+      group: labelResult?.group ?? null,
     });
 
     if (state.tooltipEventId === eventItem.id) {
@@ -2839,6 +3129,23 @@ function drawTimeline() {
     svg.appendChild(relationLine);
   });
 
+  const visibleLabelBounds = [];
+  labelPlacements.forEach(({ eventId, kind, bounds, group }) => {
+    if (!bounds || !group) return;
+    const overlapsGraphic = occupiedGraphicBounds.some(({ eventId: foreignEventId, kind: foreignKind, rect }) => {
+      if (foreignEventId === eventId) return false;
+      if (kind === "bar") return false;
+      return rectanglesOverlap(bounds, rect, 0);
+    });
+    const labelPadding = kind === "bar" ? 0 : 4;
+    const overlapsVisibleLabel = visibleLabelBounds.some((rect) => rectanglesOverlap(bounds, rect, labelPadding));
+    if (overlapsGraphic || overlapsVisibleLabel) {
+      group.setAttribute("display", "none");
+      return;
+    }
+    visibleLabelBounds.push(bounds);
+  });
+
   const scaleLabel = createSvgElement("text", {
     x: state.width - paddingX, y: 42, fill: "#ffb347", "font-size": 18,
     "font-family": "Segoe UI, Arial, sans-serif", "font-weight": 600, "text-anchor": "end",
@@ -2851,6 +3158,7 @@ function createInlineEditor(eventItem) {
   normalizeEventDisplaySettings(eventItem);
   const editor = document.createElement("div");
   editor.className = "event-inline-editor";
+  editor.dataset.eventId = eventItem.id;
   const rerenderEditor = ({ updateSelection = false, redrawTimeline = true, rerenderSearch = false } = {}) => {
     const scrollTop = ui.appFrame.scrollTop;
     if (updateSelection && state.selectedEventId === eventItem.id) updateSelectionPanel();
@@ -2889,14 +3197,26 @@ function createInlineEditor(eventItem) {
     groupSelect.appendChild(createSelectOption(groupItem.id, `${prefix}${groupItem.title}`, eventItem.groupId === groupItem.id));
   });
   groupSelect.addEventListener("change", () => {
+    const previousGroupId = eventItem.groupId;
     eventItem.groupId = groupSelect.value || null;
+    state.openGroupEditorId = null;
+    state.activeContextGroupId = eventItem.groupId ?? null;
     const assignableParents = getAssignableParentEvents(eventItem);
     if (!assignableParents.some((candidate) => candidate.id === eventItem.parentEventId)) {
       eventItem.parentEventId = null;
     }
+    if (previousGroupId && previousGroupId !== eventItem.groupId) {
+      const previousGroup = getGroupById(previousGroupId);
+      if (previousGroup) {
+        previousGroup.expanded = false;
+      }
+    }
     if (eventItem.groupId) {
       const groupItem = getGroupById(eventItem.groupId);
-      if (groupItem) groupItem.expanded = true;
+      if (groupItem) {
+        groupItem.expanded = true;
+        expandGroupAncestors(eventItem.groupId);
+      }
     }
     rerenderEditor();
   });
@@ -3039,6 +3359,12 @@ function createInlineEditor(eventItem) {
   });
   relationParentSelect.addEventListener("change", () => {
     eventItem.parentEventId = relationParentSelect.value || null;
+    if (eventItem.parentEventId) {
+      eventItem.expanded = false;
+      if (state.openEditorId === eventItem.id) {
+        state.openEditorId = null;
+      }
+    }
     rerenderEditor();
   });
 
@@ -3147,11 +3473,11 @@ function createInlineEditor(eventItem) {
     createField(t("title"), titleInput),
     createField(t("category"), categoryInput),
     createField(t("folder_or_epoch"), groupSelect),
+    relationField,
     checkboxLabel,
     yearRow,
     zoomRow,
     displayRow,
-    relationField,
     relationRow,
     createColorField(t("color_value"), colorInput, applyEventColorChange),
     createField(t("description"), descriptionArea),
@@ -3248,6 +3574,49 @@ function hasOpenGroupBranch(groupId) {
       .some((candidate) => hasOpenEventBranch(candidate.id));
 }
 
+function isGroupAncestorOrSelf(groupId, targetGroupId) {
+  let currentGroupId = targetGroupId;
+  while (currentGroupId) {
+    if (currentGroupId === groupId) return true;
+    currentGroupId = getGroupById(currentGroupId)?.parentGroupId ?? null;
+  }
+  return false;
+}
+
+function isEventAncestorOrSelf(eventId, targetEventId) {
+  let currentEventId = targetEventId;
+  while (currentEventId) {
+    if (currentEventId === eventId) return true;
+    currentEventId = getEventById(currentEventId)?.parentEventId ?? null;
+  }
+  return false;
+}
+
+function getOpenEditorEvent() {
+  return state.openEditorId ? getEventById(state.openEditorId) : null;
+}
+
+function getActiveContextGroupId() {
+  const openEditorEvent = getOpenEditorEvent();
+  if (openEditorEvent?.groupId) return openEditorEvent.groupId;
+  if (state.openGroupEditorId) return state.openGroupEditorId;
+  if (state.activeContextGroupId && hasOpenGroupBranch(state.activeContextGroupId)) {
+    return state.activeContextGroupId;
+  }
+  return null;
+}
+
+function getTopLevelEventIdWithinGroup(eventId, groupId) {
+  let currentEvent = getEventById(eventId);
+  if (!currentEvent || currentEvent.groupId !== groupId) return null;
+  while (currentEvent.parentEventId) {
+    const parentEvent = getEventById(currentEvent.parentEventId);
+    if (!parentEvent || parentEvent.groupId !== groupId) break;
+    currentEvent = parentEvent;
+  }
+  return currentEvent.id;
+}
+
 function createEventBrowserItem(eventItem, options = {}) {
   const { child = false, depth = 0, muted = false } = options;
   const item = document.createElement("div");
@@ -3301,7 +3670,7 @@ function createEventBrowserItem(eventItem, options = {}) {
   const childEvents = getEventsForGroup(eventItem.groupId).filter((candidate) => candidate.parentEventId === eventItem.id);
   const hasChildEvents = childEvents.length > 0;
   const contextOpen = eventItem.expanded && hasChildEvents;
-  const controlsMuted = muted || contextOpen;
+  const controlsMuted = muted;
   if (contextOpen) item.classList.add("is-context-open");
   row.draggable = Boolean(eventItem.groupId) && !controlsMuted;
 
@@ -3346,6 +3715,7 @@ function createEventBrowserItem(eventItem, options = {}) {
     state.selectedEventId = eventItem.id;
     state.openGroupEditorId = null;
     state.openEditorId = state.openEditorId === eventItem.id ? null : eventItem.id;
+    state.activeContextGroupId = eventItem.groupId ?? null;
     if (eventItem.groupId) {
       expandGroupAncestors(eventItem.groupId);
     }
@@ -3490,7 +3860,10 @@ function createGroupInlineEditor(groupItem) {
 function buildEventHierarchy(groupId, parentEventId = null, depth = 0, inheritedMuted = false) {
   const directChildren = getEventsForGroup(groupId)
     .filter((eventItem) => (eventItem.parentEventId ?? null) === parentEventId);
-  const activeChildId = directChildren.find((eventItem) => hasOpenEventBranch(eventItem.id))?.id ?? null;
+  const openEditorEvent = getOpenEditorEvent();
+  const activeChildId = openEditorEvent && openEditorEvent.groupId === groupId
+    ? directChildren.find((eventItem) => isEventAncestorOrSelf(eventItem.id, openEditorEvent.id))?.id ?? null
+    : null;
 
   return directChildren.flatMap((eventItem) => {
     const ownMuted = inheritedMuted || (activeChildId != null && activeChildId !== eventItem.id);
@@ -3502,7 +3875,10 @@ function buildEventHierarchy(groupId, parentEventId = null, depth = 0, inherited
 }
 
 function createGroupBrowserItem(groupItem, options = {}) {
-  const { muted = false } = options;
+  const { muted = false, loadingState = null } = options;
+  const openEditorEvent = getOpenEditorEvent();
+  const activeContextGroupId = getActiveContextGroupId();
+  const hasExplicitNestedFocus = Boolean(openEditorEvent || state.openGroupEditorId);
   const container = document.createElement("div");
   container.className = "group-browser-item";
   if (groupItem.parentGroupId) container.classList.add("is-child-group");
@@ -3511,7 +3887,30 @@ function createGroupBrowserItem(groupItem, options = {}) {
 
   const row = document.createElement("div");
   row.className = "group-row";
+  row.draggable = !muted;
+  row.addEventListener("dragstart", (event) => {
+    if (muted) {
+      event.preventDefault();
+      return;
+    }
+    state.browserDragGroupId = groupItem.id;
+    state.browserDragEventId = null;
+    row.classList.add("is-dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", groupItem.id);
+  });
+  row.addEventListener("dragend", () => {
+    state.browserDragGroupId = null;
+    row.classList.remove("is-dragging");
+  });
   row.addEventListener("dragover", (event) => {
+    if (state.browserDragGroupId) {
+      if (!canDropGroupOnGroup(state.browserDragGroupId, groupItem.id)) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      row.classList.add("is-drop-target");
+      return;
+    }
     if (!canDropEventOnGroup(state.browserDragEventId, groupItem.id)) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -3521,6 +3920,21 @@ function createGroupBrowserItem(groupItem, options = {}) {
     row.classList.remove("is-drop-target");
   });
   row.addEventListener("drop", (event) => {
+    if (state.browserDragGroupId) {
+      const draggedGroupId = state.browserDragGroupId || event.dataTransfer.getData("text/plain");
+      if (!canDropGroupOnGroup(draggedGroupId, groupItem.id)) return;
+      event.preventDefault();
+      const draggedGroup = getGroupById(draggedGroupId);
+      if (!draggedGroup) return;
+      moveGroupTreeToGroup(draggedGroup.id, groupItem.id);
+      groupItem.expanded = true;
+      expandGroupAncestors(groupItem.id);
+      state.activeContextGroupId = draggedGroup.id;
+      state.browserDragGroupId = null;
+      renderEventList();
+      drawTimeline();
+      return;
+    }
     const eventId = state.browserDragEventId || event.dataTransfer.getData("text/plain");
     if (!canDropEventOnGroup(eventId, groupItem.id)) return;
     event.preventDefault();
@@ -3538,6 +3952,16 @@ function createGroupBrowserItem(groupItem, options = {}) {
   const directEventEntries = getEventsForGroup(groupItem.id).filter((eventItem) => eventItem.parentEventId == null);
   const hasVisibleChildren = directChildGroups.length > 0 || directEventEntries.length > 0;
   const contextOpen = groupItem.expanded && hasVisibleChildren;
+  const contextChildGroupId = activeContextGroupId
+    && activeContextGroupId !== groupItem.id
+    && isGroupAncestorOrSelf(groupItem.id, activeContextGroupId)
+    ? directChildGroups.find((childGroupItem) => isGroupAncestorOrSelf(childGroupItem.id, activeContextGroupId))?.id ?? null
+    : null;
+  const activeChildGroupId = contextChildGroupId ?? null;
+  const activeChildEventId = openEditorEvent && openEditorEvent.groupId === groupItem.id
+    ? getTopLevelEventIdWithinGroup(openEditorEvent.id, groupItem.id)
+    : null;
+  const hasDeeperActiveFocus = activeChildGroupId != null || activeChildEventId != null;
   const controlsMuted = muted || contextOpen;
   if (contextOpen) container.classList.add("is-context-open");
 
@@ -3563,12 +3987,26 @@ function createGroupBrowserItem(groupItem, options = {}) {
   toggleButton.textContent = groupItem.expanded ? "▾" : "▸";
   toggleButton.addEventListener("click", () => {
     groupItem.expanded = !groupItem.expanded;
+    if (groupItem.expanded) {
+      state.activeContextGroupId = groupItem.id;
+    } else {
+      const openEditorEvent = getOpenEditorEvent();
+      if (openEditorEvent?.groupId && isGroupAncestorOrSelf(groupItem.id, openEditorEvent.groupId)) {
+        state.openEditorId = null;
+      }
+      if (state.openGroupEditorId && isGroupAncestorOrSelf(groupItem.id, state.openGroupEditorId)) {
+        state.openGroupEditorId = null;
+      }
+      if (state.activeContextGroupId && isGroupAncestorOrSelf(groupItem.id, state.activeContextGroupId)) {
+        state.activeContextGroupId = null;
+      }
+    }
     renderEventList();
   });
 
   const main = document.createElement("div");
   main.className = "group-row-main";
-  main.classList.toggle("is-disabled", controlsMuted);
+  main.classList.toggle("is-disabled", muted);
 
   const title = document.createElement("strong");
   title.textContent = groupItem.title;
@@ -3586,7 +4024,7 @@ function createGroupBrowserItem(groupItem, options = {}) {
   const addSubgroupButton = document.createElement("button");
   addSubgroupButton.type = "button";
   addSubgroupButton.className = "group-row-export group-row-subgroup";
-  addSubgroupButton.disabled = controlsMuted;
+  addSubgroupButton.disabled = muted || !contextOpen || hasDeeperActiveFocus;
   addSubgroupButton.textContent = t("add_subfolder");
   addSubgroupButton.addEventListener("click", () => {
     const newGroup = createEmptyGroup(groupItem.id);
@@ -3594,6 +4032,7 @@ function createGroupBrowserItem(groupItem, options = {}) {
     groupItem.expanded = true;
     state.openEditorId = null;
     state.openGroupEditorId = newGroup.id;
+    state.activeContextGroupId = newGroup.id;
     renderEventList();
     focusEditorNameField("group", { reveal: true, behavior: "auto" });
   });
@@ -3601,15 +4040,22 @@ function createGroupBrowserItem(groupItem, options = {}) {
   const propertiesButton = document.createElement("button");
   propertiesButton.type = "button";
   propertiesButton.className = "group-row-export group-row-properties";
-  if (state.openGroupEditorId === groupItem.id) {
+  const propertiesOpen = state.openGroupEditorId === groupItem.id;
+  const propertiesMuted = !propertiesOpen && (muted || contextOpen);
+  if (propertiesOpen) {
     propertiesButton.classList.add("is-active");
   }
-  propertiesButton.disabled = controlsMuted;
+  propertiesButton.disabled = propertiesMuted;
+  propertiesButton.classList.toggle("is-muted", propertiesMuted);
   propertiesButton.textContent = "⚙";
   propertiesButton.setAttribute("aria-label", t("folder_properties"));
   propertiesButton.addEventListener("click", () => {
+    const isClosing = state.openGroupEditorId === groupItem.id;
     state.openEditorId = null;
-    state.openGroupEditorId = state.openGroupEditorId === groupItem.id ? null : groupItem.id;
+    state.openGroupEditorId = isClosing ? null : groupItem.id;
+    state.activeContextGroupId = isClosing
+      ? (groupItem.expanded ? groupItem.id : null)
+      : groupItem.id;
     renderEventList();
   });
 
@@ -3654,6 +4100,10 @@ function createGroupBrowserItem(groupItem, options = {}) {
   row.append(checkWrap, toggleButton, main, source, addSubgroupButton, propertiesButton, exportButton, deleteButton);
   container.appendChild(row);
 
+  if (loadingState) {
+    container.appendChild(createInlineLoadingBody(loadingState));
+  }
+
   if (state.openGroupEditorId === groupItem.id) {
     container.appendChild(createGroupInlineEditor(groupItem));
   }
@@ -3661,8 +4111,6 @@ function createGroupBrowserItem(groupItem, options = {}) {
   if (groupItem.expanded) {
     const children = buildEventHierarchy(groupItem.id);
     const childGroups = directChildGroups;
-    const activeChildGroupId = childGroups.find((childGroupItem) => hasOpenGroupBranch(childGroupItem.id))?.id ?? null;
-    const activeChildEventId = directEventEntries.find((eventItem) => hasOpenEventBranch(eventItem.id))?.id ?? null;
     const childList = document.createElement("div");
     childList.className = "group-children";
     if (childGroups.length === 0 && children.length === 0) {
@@ -3699,9 +4147,17 @@ function renderEventList() {
   ui.eventList.replaceChildren();
   const browserGroups = getBrowserGroups();
   const ungroupedEvents = getUngroupedEvents();
+  const openEditorEvent = getOpenEditorEvent();
+  const activeContextGroupId = getActiveContextGroupId();
+  const activeRootGroupId = activeContextGroupId
+    ? browserGroups.find((groupItem) => isGroupAncestorOrSelf(groupItem.id, activeContextGroupId))?.id ?? null
+    : null;
+  const activeUngroupedEventId = openEditorEvent && !openEditorEvent.groupId
+    ? getTopLevelEventIdWithinGroup(openEditorEvent.id, null)
+    : null;
   ui.eventBrowserInfo.textContent = tf("browser_info", { events: timelineEvents.length, folders: browserGroups.length });
 
-  if (timelineEvents.length === 0 && browserGroups.length === 0) {
+  if (timelineEvents.length === 0 && browserGroups.length === 0 && !state.folderImportLoading) {
     ui.editorEmptyState.hidden = false;
     const emptyState = document.createElement("p");
     emptyState.className = "event-description";
@@ -3712,11 +4168,20 @@ function renderEventList() {
 
   ui.editorEmptyState.hidden = true;
   browserGroups.forEach((groupItem) => {
-    ui.eventList.appendChild(createGroupBrowserItem(groupItem));
+    const muted = activeRootGroupId != null || activeUngroupedEventId != null
+      ? activeRootGroupId !== groupItem.id
+      : false;
+    const loadingState = state.folderImportLoading?.groupId === groupItem.id
+      ? state.folderImportLoading
+      : null;
+    ui.eventList.appendChild(createGroupBrowserItem(groupItem, { muted, loadingState }));
   });
 
   ungroupedEvents.forEach((eventItem) => {
-    ui.eventList.appendChild(createEventBrowserItem(eventItem));
+    const muted = activeRootGroupId != null || activeUngroupedEventId != null
+      ? activeUngroupedEventId !== eventItem.id
+      : false;
+    ui.eventList.appendChild(createEventBrowserItem(eventItem, { muted }));
   });
 }
 
@@ -3818,10 +4283,25 @@ function createSearchResultItem(result) {
     if (!checkbox.checked) return;
     state.pendingAdds.add(result.id);
     checkbox.disabled = true;
-    ui.searchStatus.textContent = tf("loading_result", { title: result.label });
-    const eventItem = await addWikidataResult(result);
-    state.pendingAdds.delete(result.id);
-      if (eventItem) {
+    setSearchLoadingState({
+      visible: true,
+      text: tf("loading_result", { title: result.label }),
+      progress: 18,
+    });
+    let eventItem = null;
+    try {
+      eventItem = await addWikidataResult(result, ({ text, progress }) => {
+        setSearchLoadingState({ visible: true, text, progress });
+      });
+    } finally {
+      state.pendingAdds.delete(result.id);
+    }
+    if (eventItem) {
+        setSearchLoadingState({
+          visible: true,
+          text: t("loading_update_view"),
+          progress: 92,
+        });
         ui.searchStatus.textContent = tf("result_added", { title: eventItem.title });
         state.openGroupEditorId = null;
         state.openEditorId = eventItem.id;
@@ -3829,10 +4309,17 @@ function createSearchResultItem(result) {
         renderEventList();
         scrollToDetails("auto");
         focusEditorNameField("event", { reveal: true, behavior: "auto" });
-      } else {
+        setSearchLoadingState({
+          visible: true,
+          text: tf("result_added", { title: eventItem.title }),
+          progress: 100,
+        });
+        hideSearchLoading(180);
+    } else {
       checkbox.checked = false;
       checkbox.disabled = false;
       ui.searchStatus.textContent = tf("result_no_years", { title: result.label });
+      hideSearchLoading(180);
     }
     renderSearchResults();
   });
@@ -3855,12 +4342,56 @@ async function handleImportFolderFile(event) {
   if (!file) return;
 
   try {
+    hideSearchLoading();
+    setFolderImportLoading({
+      visible: true,
+      title: file.name,
+      text: tf("loading_read_file", { title: file.name }),
+      progress: 12,
+    });
+    await waitForNextPaint();
     const fileContent = await file.text();
+    setFolderImportLoading({
+      visible: true,
+      title: file.name,
+      text: t("loading_parse_file"),
+      progress: 34,
+    });
+    await waitForNextPaint();
     const payload = JSON.parse(fileContent);
-    await importFolderPayload(payload);
-    scrollToDetails();
+    setFolderImportLoading({
+      visible: true,
+      title: payload.title ?? file.name,
+      text: tf("loading_import_folder", { title: payload.title ?? file.name }),
+      progress: 52,
+      groupId: null,
+    });
+    await waitForNextPaint();
+    await importFolderPayload(payload, ({ title, text, progress, groupId }) => {
+      setFolderImportLoading({
+        visible: true,
+        title: title ?? payload.title ?? file.name,
+        text,
+        progress,
+        groupId: groupId ?? null,
+      });
+    });
+    setFolderImportLoading({
+      visible: true,
+      title: payload.title ?? file.name,
+      text: t("loading_update_view"),
+      progress: 100,
+      groupId: state.folderImportLoading?.groupId ?? null,
+    });
+    await waitForNextPaint();
+    window.setTimeout(() => {
+      setFolderImportLoading({ visible: false });
+    }, 180);
   } catch {
     ui.eventBrowserInfo.textContent = t("import_failed");
+    window.setTimeout(() => {
+      setFolderImportLoading({ visible: false });
+    }, 180);
   } finally {
     event.target.value = "";
   }
@@ -4100,6 +4631,8 @@ function applyWikidataEntityToEvent(eventItem, entity, fallback = {}) {
     eventItem.endIsToday = false;
     eventItem.isRange = eventItem.category === "Aeon"
       || eventItem.category === "Aera"
+      || eventItem.category === "Äon"
+      || eventItem.category === "Ära"
       || eventItem.category === "Periode"
       || eventItem.category === "Epoche";
   }
@@ -4193,13 +4726,19 @@ async function ensureEventFlag(eventItem) {
   }
 }
 
-async function addWikidataResult(result) {
+async function addWikidataResult(result, onProgress = null) {
   const existing = timelineEvents.find((eventItem) => eventItem.sourceId === result.id);
 
   try {
     const entity = await fetchWikidataEntity(result.id);
     if (!entity) return null;
     const importedEvent = buildEventFromWikidata(result.id, entity, result);
+    if (typeof onProgress === "function") {
+      onProgress({
+        text: tf("loading_processing_result", { title: importedEvent.title || result.label }),
+        progress: 62,
+      });
+    }
 
     if (existing) {
       applyWikidataEntityToEvent(existing, entity, result);
@@ -4221,10 +4760,22 @@ async function addWikidataResult(result) {
       if (existing.lane === undefined) existing.lane = null;
       if (!existing.displayMode) existing.displayMode = importedEvent.displayMode;
       normalizeEventDisplaySettings(existing);
+      if (typeof onProgress === "function") {
+        onProgress({
+          text: t("loading_update_view"),
+          progress: 84,
+        });
+      }
       return existing;
     }
 
     timelineEvents.push(importedEvent);
+    if (typeof onProgress === "function") {
+      onProgress({
+        text: t("loading_update_view"),
+        progress: 84,
+      });
+    }
     return importedEvent;
   } catch {
     if (existing) {

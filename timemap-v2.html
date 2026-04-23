@@ -7,14 +7,14 @@
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TimeMap</title>
-  <link rel="stylesheet" href="timemap-v2.css?v=20260423q">
+  <link rel="stylesheet" href="timemap-v2.css?v=20260423az">
 </head>
 <body>
   <main class="app-frame">
     <section class="timeline-view" id="timelineView">
       <header class="topbar">
         <div class="brand-row">
-          <button type="button" id="timelineMenuButton" class="timeline-menu-button" aria-label="Menue oeffnen" aria-expanded="false" aria-controls="timelineSideMenu">
+          <button type="button" id="timelineMenuButton" class="timeline-menu-button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="timelineSideMenu">
             <span></span>
             <span></span>
             <span></span>
@@ -38,10 +38,10 @@
         <div class="timeline-side-menu-inner">
           <div class="timeline-menu-head">
             <div class="timeline-menu-titleblock">
-              <span id="timelineMenuLabel" class="label">Menue</span>
-              <strong id="timelineMenuTitle">Zeitstrahl-Menue</strong>
+              <span id="timelineMenuLabel" class="label">Menü</span>
+              <strong id="timelineMenuTitle">Zeitstrahl-Menü</strong>
             </div>
-            <button type="button" id="timelineMenuCloseButton" class="timeline-menu-close-button" aria-label="Menue schliessen">X</button>
+            <button type="button" id="timelineMenuCloseButton" class="timeline-menu-close-button" aria-label="Menü schließen">X</button>
           </div>
           <div class="timeline-menu-section">
             <strong id="menuLanguageTitle"><span class="timeline-menu-icon">◎</span><span>1. Sprachauswahl</span></strong>
@@ -49,19 +49,19 @@
               <span id="menuLanguageLabel">Sprache</span>
               <select id="languageSelect"></select>
             </label>
-            <p id="menuLanguageDescription" class="event-description">Vorbereitung fuer Sprachwechsel der App-Oberflaeche und perspektivisch auch fuer mehrsprachige Datenquellen.</p>
+            <p id="menuLanguageDescription" class="event-description">Vorbereitung für Sprachwechsel der App-Oberfläche und perspektivisch auch für mehrsprachige Datenquellen.</p>
           </div>
           <div class="timeline-menu-section">
             <strong id="menuHelpTitle"><span class="timeline-menu-icon">?</span><span>2. Hilfe zur Funktionsweise der App</span></strong>
-            <p id="menuHelpDescription" class="event-description">Platz fuer eine kurze Einfuehrung, Bedienhinweise und erklaerende Beispiele.</p>
+            <p id="menuHelpDescription" class="event-description">Platz für eine kurze Einführung, Bedienhinweise und erklärende Beispiele.</p>
           </div>
           <div class="timeline-menu-section">
             <strong id="menuAppsTitle"><span class="timeline-menu-icon">⇄</span><span>3. Wechsel zu anderen Applikationen</span></strong>
-            <p id="menuAppsDescription" class="event-description">Vorbereitung fuer weitere Werkzeuge wie GenMap zur Anzeige genealogischer GEDCOM-Dateien.</p>
+            <p id="menuAppsDescription" class="event-description">Vorbereitung für weitere Werkzeuge wie GenMap zur Anzeige genealogischer GEDCOM-Dateien.</p>
           </div>
           <div class="timeline-menu-section">
             <strong id="menuVisualToolsTitle"><span class="timeline-menu-icon">▦</span><span>4. Weitere Data-Visualisation Tools</span></strong>
-            <p id="menuVisualToolsDescription" class="event-description">Bereich fuer kuenftige Module und alternative Visualisierungsansichten.</p>
+            <p id="menuVisualToolsDescription" class="event-description">Bereich für künftige Module und alternative Visualisierungsansichten.</p>
           </div>
         </div>
       </aside>
@@ -84,7 +84,7 @@
         </div>
 
         <div id="editorEmptyState" class="event-description">
-          Fuege ueber die Suche rechts ein Wikidata-Ereignis hinzu oder waehle einen vorhandenen Eintrag aus dem Zeitstrahl.
+          Füge über die Suche rechts ein Wikidata-Ereignis hinzu oder wähle einen vorhandenen Eintrag aus dem Zeitstrahl.
         </div>
 
         <div class="event-library">
@@ -95,6 +95,16 @@
             <button type="button" id="addFolderButton" class="secondary-button">Ordner</button>
             <button type="button" id="addEpochGroupButton" class="secondary-button">Epochen</button>
             <button type="button" id="importFolderButton" class="secondary-button">Importieren</button>
+          </div>
+          <div id="searchLoadingPanel" class="search-loading-panel" hidden aria-live="polite">
+            <div class="search-loading-head">
+              <span id="searchLoadingLabel" class="label">Ladevorgang</span>
+              <span id="searchLoadingPercent" class="search-loading-percent">0%</span>
+            </div>
+            <div class="search-loading-bar" aria-hidden="true">
+              <span id="searchLoadingFill" class="search-loading-fill"></span>
+            </div>
+            <p id="searchLoadingText" class="search-loading-text">Bereite Import vor ...</p>
           </div>
           <input id="importFolderInput" type="file" accept=".json,application/json" hidden>
           <div id="epochMenu" class="epoch-menu" hidden></div>
@@ -111,7 +121,7 @@
       <article class="details-inline search-panel">
         <div class="panel-header">
           <span id="searchPanelLabel" class="label">Wikidata-Suche</span>
-          <strong id="searchPanelTitle">Eintraege finden und hinzufuegen</strong>
+          <strong id="searchPanelTitle">Einträge finden und hinzufügen</strong>
         </div>
 
         <form id="searchForm" class="search-form">
@@ -128,6 +138,6 @@
     </section>
   </main>
 
-  <script src="timemap-v2.js?v=20260423q"></script>
+  <script src="timemap-v2.js?v=20260423az"></script>
 </body>
 </html>
