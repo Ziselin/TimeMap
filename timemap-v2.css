@@ -34,6 +34,13 @@ body {
   overflow-y: auto;
   overscroll-behavior-y: contain;
   background: var(--surface);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.app-frame::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .timeline-view,
@@ -48,43 +55,45 @@ body {
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  padding: 24px 24px 0;
+  padding: 18px 0 0;
   gap: 0;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  align-items: end;
-  margin-bottom: 12px;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 0 26px;
+  min-height: 58px;
 }
 
 .brand-row {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
   min-width: 0;
 }
 
 .brand-mark {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   min-width: 0;
 }
 
 .brand-mark img {
   display: block;
-  height: clamp(28px, 4vw, 44px);
+  height: clamp(22px, 2.8vw, 34px);
   width: auto;
-  max-width: min(24vw, 220px);
+  max-width: min(20vw, 180px);
   object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.22));
 }
 
 .timeline-menu-button {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   display: inline-flex;
   flex-direction: column;
@@ -93,9 +102,10 @@ body {
   gap: 5px;
   flex: 0 0 auto;
   color: rgba(238, 243, 246, 0.92);
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.035);
   position: relative;
+  border-radius: 10px;
 }
 
 .timeline-menu-button span {
@@ -133,8 +143,9 @@ body {
 .control-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   justify-content: flex-end;
+  align-items: center;
 }
 
 button {
@@ -145,6 +156,12 @@ button {
   font: inherit;
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
+  border-radius: 10px;
+}
+
+.control-grid button {
+  min-height: 42px;
+  padding: 10px 18px;
 }
 
 button:hover {
@@ -162,8 +179,10 @@ button:focus-visible {
   min-height: 0;
   height: 100%;
   background: #1b2024;
-  border: 1px solid var(--surface-line);
+  border-top: 1px solid var(--surface-line);
   border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
 }
 
 .timeline-menu-overlay {
@@ -310,14 +329,16 @@ button:focus-visible {
 
 .workspace-strip {
   width: 100%;
-  border: 1px solid var(--surface-line);
-  border-top: 0;
+  border-top: 1px solid var(--surface-line);
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
   background: rgba(255, 255, 255, 0.025);
   color: rgba(238, 243, 246, 0.45);
   text-align: center;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 18px 16px;
+  padding: 16px 16px;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -336,13 +357,61 @@ button:focus-visible {
   pointer-events: none;
 }
 
+.chart-strip-controls {
+  position: absolute;
+  right: 58px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.chart-strip-button {
+  min-width: 30px;
+  height: 28px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  color: rgba(238, 243, 246, 0.78);
+}
+
+.chart-strip-button-icon {
+  min-width: 40px;
+  padding: 0 6px;
+}
+
+.chart-strip-button-icon svg {
+  width: 18px;
+  height: 18px;
+  overflow: visible;
+}
+
+.chart-strip-button-icon polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-strip-button-icon circle {
+  fill: currentColor;
+}
+
+.chart-strip-button.is-active {
+  border-color: rgba(255, 179, 71, 0.45);
+  color: var(--highlight);
+  background: rgba(255, 179, 71, 0.12);
+}
+
 .workspace-fullscreen-button {
   position: absolute;
   top: 50%;
   right: 14px;
   transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -350,7 +419,7 @@ button:focus-visible {
   color: rgba(255, 179, 71, 0.9);
   border-color: rgba(255, 179, 71, 0.28);
   background: rgba(255, 179, 71, 0.06);
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1;
 }
 
@@ -366,6 +435,8 @@ button:focus-visible {
 }
 
 .details-view {
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   padding: 24px;
@@ -373,6 +444,7 @@ button:focus-visible {
   grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 1fr);
   gap: 18px;
   background: var(--surface-soft);
+  overflow: hidden;
 }
 
 .details-inline {
@@ -382,6 +454,15 @@ button:focus-visible {
   padding: 12px;
   border: 1px solid var(--surface-line);
   background: rgba(255, 255, 255, 0.03);
+  min-height: 0;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.details-inline::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .panel-header {
@@ -441,6 +522,75 @@ button:focus-visible {
   gap: 18px;
 }
 
+.data-mode-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.data-mode-button {
+  min-width: 108px;
+}
+
+.data-mode-button.is-active {
+  border-color: rgba(255, 179, 71, 0.45);
+  color: var(--highlight);
+  background: rgba(255, 179, 71, 0.12);
+}
+
+.data-mode-panel {
+  display: block;
+}
+
+.data-mode-panel[hidden] {
+  display: none !important;
+}
+
+.chart-import-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chart-source-row {
+  margin-bottom: 10px;
+}
+
+.chart-search-form {
+  margin-bottom: 10px;
+}
+
+.chart-results {
+  display: grid;
+  gap: 10px;
+}
+
+.chart-result-card {
+  border: 1px solid var(--surface-line);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.chart-result-card .field {
+  margin-top: 4px;
+}
+
+.chart-result-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.chart-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -462,6 +612,7 @@ button:focus-visible {
 
 .compact-color-field {
   gap: 0;
+  z-index: 12;
 }
 
 .compact-color-row {
@@ -514,9 +665,10 @@ button:focus-visible {
 
 .color-palette {
   position: absolute;
-  top: calc(100% - 2px);
+  top: auto;
+  bottom: calc(100% + 8px);
   right: 0;
-  z-index: 8;
+  z-index: 40;
   display: grid;
   grid-template-columns: repeat(4, 28px);
   gap: 8px;
@@ -673,6 +825,13 @@ button:focus-visible {
   font-size: 0.9rem;
 }
 
+.editor-inline-hint {
+  margin: -2px 0 4px;
+  line-height: 1.35;
+  font-size: 0.8rem;
+  color: #ffb347;
+}
+
 .event-library {
   display: flex;
   flex-direction: column;
@@ -692,6 +851,65 @@ button:focus-visible {
   flex-direction: column;
   gap: 6px;
   min-height: 120px;
+}
+
+.chart-section-label {
+  display: block;
+  margin: 16px 0 8px;
+}
+
+.chart-browser-item {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+}
+
+.chart-browser-item.is-open {
+  border-left-color: rgba(255, 179, 71, 0.45);
+}
+
+.chart-browser-item.is-focus-muted {
+  opacity: 0.42;
+}
+
+.chart-row {
+  padding: 12px 14px;
+}
+
+.chart-row-main {
+  min-width: 0;
+  cursor: pointer;
+}
+
+.chart-row-main strong,
+.chart-row-main span,
+.chart-row-main small {
+  display: block;
+}
+
+.chart-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.chart-inline-editor {
+  display: grid;
+  gap: 14px;
+  padding: 0 14px 14px;
+}
+
+.chart-legend-line {
+  width: 28px;
+  height: 0;
+  border-top: 3px solid currentColor;
+  border-radius: 999px;
+  margin-top: 8px;
+  align-self: center;
+}
+
+.chart-row-date {
+  align-self: center;
 }
 
 .epoch-menu {
@@ -735,7 +953,7 @@ button:focus-visible {
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   background: transparent;
   border-radius: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .event-browser-item.is-child {
@@ -768,7 +986,7 @@ button:focus-visible {
   border: 1px solid rgba(255, 179, 71, 0.22);
   background: rgba(255, 255, 255, 0.015);
   border-radius: 4px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .import-loading-card {
@@ -1149,6 +1367,48 @@ button:focus-visible {
   display: none !important;
 }
 
+.confirm-modal[hidden] {
+  display: none !important;
+}
+
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+}
+
+.confirm-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 12, 14, 0.52);
+}
+
+.confirm-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(420px, calc(100vw - 32px));
+  display: grid;
+  gap: 14px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(255, 179, 71, 0.22);
+  background: #2b3136;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+}
+
+.confirm-modal-dialog p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .search-loading-head {
   display: flex;
   align-items: center;
@@ -1247,9 +1507,15 @@ button:focus-visible {
   }
 
   .details-view {
+    height: auto;
+    overflow: visible;
     min-height: auto;
     grid-template-columns: 1fr;
     padding: 16px;
+  }
+
+  .details-inline {
+    overflow: visible;
   }
 
   .search-form,
