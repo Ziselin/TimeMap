@@ -27,6 +27,8 @@ const ui = {
   focusNowButton: document.getElementById("focusNowButton"),
   openWorkspaceStrip: document.getElementById("openWorkspaceStrip"),
   fullscreenButton: document.getElementById("fullscreenButton"),
+  presentationZoomOutButton: document.getElementById("presentationZoomOutButton"),
+  presentationZoomInButton: document.getElementById("presentationZoomInButton"),
   editorEmptyState: document.getElementById("editorEmptyState"),
   searchForm: document.getElementById("searchForm"),
   searchInput: document.getElementById("searchInput"),
@@ -205,9 +207,10 @@ const I18N = {
     arrow_up_left: "Slave -> Master",
     arrow_both: "beidseitig",
     arrow_none: "ohne Pfeil",
-    line: "Linie",
-    arrows: "Pfeile",
-    relation: "Zuordnung",
+      line: "Linie",
+      arrows: "Pfeile",
+      preview: "Vorschau",
+      relation: "Zuordnung",
     display_line: "Strecke",
     display_bar: "Balken",
     display: "Darstellung",
@@ -317,6 +320,8 @@ const I18N = {
     chart_strip_mixed: "Mischen",
     chart_strip_focus: "Chart vorn",
     chart_strip_axis: "Y-Achse",
+    presentation_zoom_in: "Ansicht vergrößern",
+    presentation_zoom_out: "Ansicht verkleinern",
     sources_placeholder: "Quellen werden vorbereitet. Später können hier Publikationen, Datensätze und Erscheinungsdaten durchsucht werden.",
     today_keyword: "heute",
     until_connector: "bis",
@@ -389,9 +394,10 @@ const I18N = {
     arrow_up_left: "slave -> master",
     arrow_both: "both directions",
     arrow_none: "no arrow",
-    line: "Line",
-    arrows: "Arrows",
-    relation: "Assignment",
+      line: "Line",
+      arrows: "Arrows",
+      preview: "Preview",
+      relation: "Assignment",
     display_line: "Line",
     display_bar: "Bar",
     display: "Display",
@@ -501,6 +507,8 @@ const I18N = {
     chart_strip_mixed: "Mixed",
     chart_strip_focus: "Chart front",
     chart_strip_axis: "Y axis",
+    presentation_zoom_in: "Zoom in view",
+    presentation_zoom_out: "Zoom out view",
     sources_placeholder: "Sources are being prepared. Later, publications, datasets and publication dates can be searched here.",
     today_keyword: "today",
     until_connector: "to",
@@ -692,6 +700,7 @@ const state = {
   activeChartId: null,
   chartDisplayMode: "mixed",
   showYAxis: false,
+  presentationZoom: 1,
 };
 
 Object.assign(I18N.de, {
@@ -909,8 +918,42 @@ function updateChartStripControls() {
   if (ui.chartStripControls) {
     ui.chartStripControls.hidden = chartItems.length === 0;
   }
-  ui.toggleChartsButton?.classList.toggle("is-active", state.chartDisplayMode === "events");
+  ui.toggleChartsButton?.classList.toggle("is-active", state.chartDisplayMode === "mixed" || state.chartDisplayMode === "chart-focus");
+  ui.toggleChartsButton?.classList.toggle("is-muted", state.chartDisplayMode === "events");
+  ui.toggleChartsButton?.classList.toggle("is-off", state.chartDisplayMode === "hidden");
   ui.toggleYAxisButton?.classList.toggle("is-active", state.showYAxis);
+}
+
+function updateFullscreenButtonState() {
+  if (!ui.fullscreenButton) return;
+  const isActive = Boolean(document.fullscreenElement);
+  ui.fullscreenButton.classList.toggle("is-active", isActive);
+  ui.fullscreenButton.classList.toggle("is-muted", !isActive);
+}
+
+function applyFixedSvgScale(element, anchorX, anchorY) {
+  if (!element) return;
+  const scale = 1 / (Number(state.presentationZoom) || 1);
+  if (!Number.isFinite(scale) || Math.abs(scale - 1) < 0.001) {
+    element.removeAttribute("transform");
+    return;
+  }
+  element.setAttribute(
+    "transform",
+    `translate(${anchorX} ${anchorY}) scale(${scale}) translate(${-anchorX} ${-anchorY})`,
+  );
+}
+
+function applyPresentationZoom() {
+  if (!svg) return;
+  svg.style.setProperty("--presentation-scale", String(state.presentationZoom || 1));
+}
+
+function adjustPresentationZoom(delta) {
+  const current = Number(state.presentationZoom) || 1;
+  const next = Math.max(0.8, Math.min(1.8, Math.round((current + delta) * 100) / 100));
+  state.presentationZoom = next;
+  applyPresentationZoom();
 }
 
 function applyStaticTranslations() {
@@ -938,6 +981,20 @@ function applyStaticTranslations() {
   if (ui.focusNowButton) ui.focusNowButton.textContent = t("today");
   if (ui.workspaceStripLabel) ui.workspaceStripLabel.textContent = t("workspace_strip");
   if (ui.fullscreenButton) ui.fullscreenButton.textContent = "\u26f6";
+  if (ui.presentationZoomOutButton) {
+    ui.presentationZoomOutButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="5.5"></circle><line x1="14.5" y1="14.5" x2="19" y2="19"></line><line x1="7.3" y1="10" x2="12.7" y2="10"></line></svg>';
+  }
+  if (ui.presentationZoomInButton) {
+    ui.presentationZoomInButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="5.5"></circle><line x1="14.5" y1="14.5" x2="19" y2="19"></line><line x1="7.3" y1="10" x2="12.7" y2="10"></line><line x1="10" y1="7.3" x2="10" y2="12.7"></line></svg>';
+  }
+  if (ui.presentationZoomInButton) {
+    ui.presentationZoomInButton.title = t("presentation_zoom_in");
+    ui.presentationZoomInButton.setAttribute("aria-label", t("presentation_zoom_in"));
+  }
+  if (ui.presentationZoomOutButton) {
+    ui.presentationZoomOutButton.title = t("presentation_zoom_out");
+    ui.presentationZoomOutButton.setAttribute("aria-label", t("presentation_zoom_out"));
+  }
   if (ui.editorPanelLabel) ui.editorPanelLabel.textContent = t("editor_panel_label");
   if (ui.editorPanelTitle) ui.editorPanelTitle.textContent = t("editor_panel_title");
   if (ui.editorEmptyState) ui.editorEmptyState.textContent = t("editor_empty");
@@ -2345,6 +2402,81 @@ function createField(labelText, inputElement) {
   return label;
 }
 
+function createRelationPreview(lineStyle, direction) {
+  const preview = document.createElement("div");
+  preview.className = "relation-preview-box";
+  const svg = createSvgElement("svg", {
+    viewBox: "0 0 120 42",
+    class: "relation-preview-svg",
+    "aria-hidden": "true",
+  });
+  const defs = createSvgElement("defs");
+  defs.appendChild(createSvgElement("marker", {
+    id: "editor-preview-arrow-end",
+    viewBox: "0 0 10 10",
+    refX: 9,
+    refY: 5,
+    markerWidth: 6,
+    markerHeight: 6,
+    orient: "auto-start-reverse",
+  }));
+  defs.lastChild.appendChild(createSvgElement("path", {
+    d: "M 0 0 L 10 5 L 0 10 z",
+    fill: "#d7edf2",
+  }));
+  defs.appendChild(createSvgElement("marker", {
+    id: "editor-preview-arrow-start",
+    viewBox: "0 0 10 10",
+    refX: 1,
+    refY: 5,
+    markerWidth: 6,
+    markerHeight: 6,
+    orient: "auto",
+  }));
+  defs.lastChild.appendChild(createSvgElement("path", {
+    d: "M 10 0 L 0 5 L 10 10 z",
+    fill: "#d7edf2",
+  }));
+  svg.appendChild(defs);
+
+  if (lineStyle !== "none") {
+    const line = createSvgElement("line", {
+      x1: 18,
+      y1: 21,
+      x2: 102,
+      y2: 21,
+      stroke: "#d7edf2",
+      "stroke-width": 1.8,
+      "stroke-linecap": "round",
+      opacity: 0.92,
+    });
+    if (lineStyle === "dotted") {
+      line.setAttribute("stroke-dasharray", "4 4");
+    }
+    if (direction === "parent-to-child" || direction === "both") {
+      line.setAttribute("marker-end", "url(#editor-preview-arrow-end)");
+    }
+    if (direction === "child-to-parent" || direction === "both") {
+      line.setAttribute("marker-start", "url(#editor-preview-arrow-start)");
+    }
+    svg.appendChild(line);
+  }
+  svg.appendChild(createSvgElement("circle", {
+    cx: 18,
+    cy: 21,
+    r: 3.4,
+    fill: "#ffb347",
+  }));
+  svg.appendChild(createSvgElement("circle", {
+    cx: 102,
+    cy: 21,
+    r: 3.4,
+    fill: "#9ed3df",
+  }));
+  preview.appendChild(svg);
+  return preview;
+}
+
 function focusEditorNameField(kind, options = {}) {
   const { reveal = false, behavior = "smooth", targetId = null } = options;
   window.requestAnimationFrame(() => {
@@ -2850,6 +2982,10 @@ function setChartAxisGroupOffset(chartItem, offsetPx, charts = chartItems) {
 
 function isChartMuteMode() {
   return state.chartDisplayMode === "events";
+}
+
+function isChartHiddenMode() {
+  return state.chartDisplayMode === "hidden";
 }
 
 function getChartRenderColor(chartItem) {
@@ -3745,6 +3881,7 @@ function handleWorkspaceStripOpen(event, behavior = "smooth") {
   if (event) {
     if (event.target?.closest?.("#fullscreenButton")) return;
     if (event.target?.closest?.("#chartStripControls")) return;
+    if (event.target?.closest?.(".workspace-zoom-controls")) return;
     if (event.type === "wheel" && event.deltaY <= 0) return;
     event.preventDefault();
   }
@@ -3765,6 +3902,7 @@ async function toggleFullscreen(event) {
   } catch {
     // Some embedded browsers can block fullscreen; in that case the F11 fallback still works.
   }
+  updateFullscreenButtonState();
 }
 
 function toggleTodayFocus() {
@@ -4066,6 +4204,10 @@ function bindEventSelection(target, eventItem) {
 }
 
 function drawChartsOnTimeline({ paddingX, lineY }) {
+  if (isChartHiddenMode()) {
+    state.chartDragBounds = {};
+    return;
+  }
   const visibleCharts = getVisibleCharts();
   state.chartDragBounds = {};
   if (!visibleCharts.length) return;
@@ -4139,28 +4281,29 @@ function drawChartsOnTimeline({ paddingX, lineY }) {
       const isChecked = state.showYAxis && activeAxisGroupId === groupId && chartItem.yAxisEnabled !== false;
       const rowY = baseLabelY - (index * 15);
       const labelsX = 10;
+      const legendRow = createSvgElement("g", {});
       const clickTarget = createSvgElement("rect", {
-        x: labelsX - 2,
-        y: rowY - 10,
-        width: 260,
-        height: 14,
-        fill: "transparent",
-      });
-      if (!chartsMuted) {
-        clickTarget.style.cursor = "pointer";
-        clickTarget.addEventListener("click", () => {
-          state.activeChartId = chartItem.id;
-          state.showYAxis = chartItem.yAxisEnabled !== false;
-          updateChartStripControls();
-          drawTimeline();
+          x: labelsX - 2,
+          y: rowY - 10,
+          width: 260,
+          height: 14,
+          fill: "transparent",
         });
-      }
-      svg.appendChild(clickTarget);
+        if (!chartsMuted) {
+          clickTarget.style.cursor = "pointer";
+          clickTarget.addEventListener("click", () => {
+            state.activeChartId = chartItem.id;
+          state.showYAxis = chartItem.yAxisEnabled !== false;
+            updateChartStripControls();
+            drawTimeline();
+          });
+        }
+        legendRow.appendChild(clickTarget);
 
-      const checkbox = createSvgElement("rect", {
-        x: labelsX,
-        y: rowY - 8,
-        width: 9,
+        const checkbox = createSvgElement("rect", {
+          x: labelsX,
+          y: rowY - 8,
+          width: 9,
         height: 9,
         rx: 2,
         ry: 2,
@@ -4173,16 +4316,16 @@ function drawChartsOnTimeline({ paddingX, lineY }) {
         checkbox.addEventListener("click", () => {
           state.activeChartId = chartItem.id;
           state.showYAxis = chartItem.yAxisEnabled !== false;
-          updateChartStripControls();
-          drawTimeline();
-        });
-      }
-      svg.appendChild(checkbox);
+            updateChartStripControls();
+            drawTimeline();
+          });
+        }
+        legendRow.appendChild(checkbox);
 
-      if (isChecked) {
-        const checkMark = createSvgElement("path", {
-          d: `M ${labelsX + 2} ${rowY - 4} L ${labelsX + 4} ${rowY - 2} L ${labelsX + 7} ${rowY - 6}`,
-          fill: "none",
+        if (isChecked) {
+          const checkMark = createSvgElement("path", {
+            d: `M ${labelsX + 2} ${rowY - 4} L ${labelsX + 4} ${rowY - 2} L ${labelsX + 7} ${rowY - 6}`,
+            fill: "none",
           stroke: "#1f2428",
           "stroke-width": 1.4,
           "stroke-linecap": "round",
@@ -4193,16 +4336,16 @@ function drawChartsOnTimeline({ paddingX, lineY }) {
           checkMark.addEventListener("click", () => {
             state.activeChartId = chartItem.id;
             state.showYAxis = chartItem.yAxisEnabled !== false;
-            updateChartStripControls();
-            drawTimeline();
-          });
+              updateChartStripControls();
+              drawTimeline();
+            });
+          }
+          legendRow.appendChild(checkMark);
         }
-        svg.appendChild(checkMark);
-      }
 
-      const label = createSvgElement("text", {
-        x: labelsX + 15,
-        y: rowY,
+        const label = createSvgElement("text", {
+          x: labelsX + 15,
+          y: rowY,
         fill: getChartRenderColor(chartItem),
         opacity: 0.94,
         "font-size": 11,
@@ -4216,12 +4359,14 @@ function drawChartsOnTimeline({ paddingX, lineY }) {
           state.showYAxis = chartItem.yAxisEnabled !== false;
           updateChartStripControls();
           drawTimeline();
-        });
-      }
-      label.textContent = getChartLegendLabel(chartItem);
-      svg.appendChild(label);
-    });
-  }
+          });
+        }
+        label.textContent = getChartLegendLabel(chartItem);
+        legendRow.appendChild(label);
+        applyFixedSvgScale(legendRow, labelsX, rowY);
+        svg.appendChild(legendRow);
+      });
+    }
 
   visibleCharts.forEach((chartItem) => {
     const preset = getChartDisplayPreset(chartItem);
@@ -4881,6 +5026,7 @@ function drawTimeline() {
     "font-family": "Segoe UI, Arial, sans-serif", "font-weight": 600, "text-anchor": "end",
   });
   scaleLabel.textContent = stepToLabel(step);
+  applyFixedSvgScale(scaleLabel, state.width - paddingX, 42);
   svg.appendChild(scaleLabel);
 }
 
@@ -5120,18 +5266,26 @@ function createInlineEditor(eventItem) {
     createSelectOption("both", t("arrow_both"), eventItem.relationDirection === "both"),
     createSelectOption("none", t("arrow_none"), eventItem.relationDirection === "none"),
   );
+  const relationPreviewField = createField(
+    t("preview"),
+    createRelationPreview(eventItem.relationLineStyle, eventItem.relationDirection),
+  );
+  relationPreviewField.classList.add("relation-preview-field");
   relationDirectionSelect.addEventListener("change", () => {
     eventItem.relationDirection = relationDirectionSelect.value;
     rerenderEditor({ redrawTimeline: true });
   });
 
   const relationRow = document.createElement("div");
-  relationRow.className = "field-row year-fields";
+  relationRow.className = "field-row relation-control-row";
   const relationStyleField = createField(t("line"), relationStyleSelect);
+  relationStyleField.classList.add("relation-compact-field");
   const relationDirectionField = createField(t("arrows"), relationDirectionSelect);
+  relationDirectionField.classList.add("relation-compact-field");
   relationRow.append(
     relationStyleField,
     relationDirectionField,
+    relationPreviewField,
   );
   const relationField = createField(t("relation"), relationParentSelect);
   const folderField = createField(t("folder"), groupSelect);
@@ -7445,6 +7599,16 @@ function bindEvents() {
     event.stopPropagation();
   });
   ui.fullscreenButton.addEventListener("click", toggleFullscreen);
+  ["pointerdown", "pointerup", "click", "dblclick", "wheel"].forEach((eventName) => {
+    ui.presentationZoomInButton?.addEventListener(eventName, suppressWorkspaceStripInteraction);
+    ui.presentationZoomOutButton?.addEventListener(eventName, suppressWorkspaceStripInteraction);
+  });
+  ui.presentationZoomInButton?.addEventListener("click", () => {
+    adjustPresentationZoom(0.1);
+  });
+  ui.presentationZoomOutButton?.addEventListener("click", () => {
+    adjustPresentationZoom(-0.1);
+  });
   ui.addCustomEventButton.addEventListener("click", () => {
     const newEvent = createEmptyEvent();
     timelineEvents.push(newEvent);
@@ -7522,8 +7686,16 @@ function bindEvents() {
     ui.toggleChartsButton?.addEventListener(eventName, suppressWorkspaceStripInteraction);
     ui.toggleYAxisButton?.addEventListener(eventName, suppressWorkspaceStripInteraction);
   });
+  document.addEventListener("fullscreenchange", updateFullscreenButtonState);
   ui.toggleChartsButton?.addEventListener("click", () => {
-    state.chartDisplayMode = state.chartDisplayMode === "events" ? "mixed" : "events";
+    if (state.chartDisplayMode === "mixed" || state.chartDisplayMode === "chart-focus") {
+      state.chartDisplayMode = "events";
+    } else if (state.chartDisplayMode === "events") {
+      state.chartDisplayMode = "hidden";
+      state.showYAxis = false;
+    } else {
+      state.chartDisplayMode = "mixed";
+    }
     updateChartStripControls();
     drawTimeline();
   });
@@ -7583,6 +7755,8 @@ function init() {
   populateLanguageSelect();
   bindEvents();
   applyStaticTranslations();
+  applyPresentationZoom();
+  updateFullscreenButtonState();
   updateSelectionPanel();
   renderEpochMenu();
   renderEventList();

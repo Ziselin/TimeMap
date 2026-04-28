@@ -193,6 +193,8 @@ button:focus-visible {
   border-bottom: 0;
   border-left: 0;
   border-right: 0;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .timeline-menu-overlay {
@@ -369,7 +371,9 @@ button:focus-visible {
 
 .chart-strip-controls {
   position: absolute;
-  right: 58px;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   gap: 6px;
   align-items: center;
@@ -415,22 +419,76 @@ button:focus-visible {
   background: rgba(255, 179, 71, 0.12);
 }
 
+.chart-strip-button.is-muted {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #8b949b;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chart-strip-button.is-off {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(238, 243, 246, 0.42);
+  background: #1b2024;
+}
+
 .workspace-fullscreen-button {
   position: absolute;
   top: 50%;
   right: 14px;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  padding: 0;
+  min-width: 30px;
+  height: 28px;
+  padding: 0 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 179, 71, 0.9);
-  border-color: rgba(255, 179, 71, 0.28);
-  background: rgba(255, 179, 71, 0.06);
-  font-size: 0.95rem;
+  color: rgba(238, 243, 246, 0.78);
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.78rem;
   line-height: 1;
+}
+
+.workspace-zoom-controls {
+  position: absolute;
+  top: 50%;
+  right: 56px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.workspace-zoom-button {
+  position: static;
+  transform: none;
+}
+
+.workspace-zoom-button svg {
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+}
+
+.workspace-zoom-button circle,
+.workspace-zoom-button line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workspace-fullscreen-button.is-active {
+  border-color: rgba(255, 179, 71, 0.45);
+  color: var(--highlight);
+  background: rgba(255, 179, 71, 0.12);
+}
+
+.workspace-fullscreen-button.is-muted {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #8b949b;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .workspace-fullscreen-button:hover {
@@ -442,6 +500,9 @@ button:focus-visible {
   display: block;
   width: 100%;
   height: 100%;
+  transform: scale(var(--presentation-scale, 1));
+  transform-origin: center center;
+  transition: transform 140ms ease;
 }
 
 .details-view {
@@ -759,6 +820,42 @@ button:focus-visible {
 
 .year-fields .field {
   flex: 1;
+}
+
+.relation-control-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.85fr) 148px;
+  gap: 10px;
+  align-items: end;
+}
+
+.relation-control-row > .field {
+  min-width: 0;
+}
+
+.relation-compact-field select {
+  min-width: 0;
+}
+
+.relation-preview-field {
+  flex: 0 0 auto;
+}
+
+.relation-preview-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.relation-preview-svg {
+  width: 100%;
+  height: 30px;
+  display: block;
 }
 
 .checkbox-field,
@@ -1535,6 +1632,10 @@ button:focus-visible {
   .search-form,
   .field-row {
     flex-direction: column;
+  }
+
+  .relation-control-row {
+    grid-template-columns: 1fr;
   }
 
   .event-row {
